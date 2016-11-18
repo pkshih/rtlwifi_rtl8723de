@@ -2621,6 +2621,7 @@ struct rtl_halmac_ops {
 
 	int (*halmac_chk_txdesc)(struct rtl_priv *rtlpriv, u8 *txdesc,
 				 u32 size);
+	int (*halmac_iqk)(struct rtl_priv *rtlpriv, u8 clear, u8 segment);
 };
 
 struct rtl_halmac_indicator {
