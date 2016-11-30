@@ -27,6 +27,8 @@
 
 #include	"../wifi.h"
 
+#define		BTC_COEX_OFFLOAD			0
+
 #define		NORMAL_EXEC				false
 #define		FORCE_EXEC				true
 
@@ -62,9 +64,12 @@
 #define		BTC_ANT_PATH_WIFI			0
 #define		BTC_ANT_PATH_BT				1
 #define		BTC_ANT_PATH_PTA			2
+#define		BTC_ANT_PATH_WIFI5G			3
+#define		BTC_ANT_PATH_AUTO			4
 /* dual Antenna definition */
 #define		BTC_ANT_WIFI_AT_MAIN			0
 #define		BTC_ANT_WIFI_AT_AUX			1
+#define		BTC_ANT_WIFI_AT_DIVERSITY	2
 /* coupler Antenna definition */
 #define		BTC_ANT_WIFI_AT_CPL_MAIN		0
 #define		BTC_ANT_WIFI_AT_CPL_AUX			1
@@ -148,9 +153,11 @@ struct btc_board_info {
 	u8 bt_chip_type;
 	u8 pg_ant_num;	/* pg ant number */
 	u8 btdm_ant_num;	/* ant number for btdm */
+	u8 btdm_ant_num_by_ant_det;
 	u8 btdm_ant_pos;
 	u8 single_ant_path; /* current used for 8723b only, 1=>s0,  0=>s1 */
 	bool tfbga_package;
+	bool btdm_ant_det_finish;
 
 	u8 rfe_type;
 	u8 ant_div_cfg;
@@ -204,6 +211,7 @@ enum btc_wifi_traffic_dir {
 enum btc_wifi_pnp {
 	BTC_WIFI_PNP_WAKE_UP = 0x0,
 	BTC_WIFI_PNP_SLEEP = 0x1,
+	BTC_WIFI_PNP_SLEEP_KEEP_ANT = 0x2,
 	BTC_WIFI_PNP_MAX
 };
 
@@ -315,6 +323,7 @@ enum btc_vendor {
 enum btc_set_type {
 	/* type bool */
 	BTC_SET_BL_BT_DISABLE,
+	BTC_SET_BL_BT_ENABLE_DISABLE_CHANGE,
 	BTC_SET_BL_BT_TRAFFIC_BUSY,
 	BTC_SET_BL_BT_LIMITED_DIG,
 	BTC_SET_BL_FORCE_TO_ROAM,
@@ -383,6 +392,7 @@ enum btc_notify_type_lps {
 enum btc_notify_type_scan {
 	BTC_SCAN_FINISH = 0x0,
 	BTC_SCAN_START = 0x1,
+	BTC_SCAN_START_2G = 0x2,
 	BTC_SCAN_MAX
 };
 
@@ -397,6 +407,8 @@ enum btc_notify_type_switchband {
 enum btc_notify_type_associate {
 	BTC_ASSOCIATE_FINISH = 0x0,
 	BTC_ASSOCIATE_START = 0x1,
+	BTC_ASSOCIATE_5G_FINISH = 0x2,
+	BTC_ASSOCIATE_5G_START = 0x3,
 	BTC_ASSOCIATE_MAX
 };
 
@@ -497,6 +509,7 @@ typedef bool (*bfp_btc_get_bt_afh_map_from_bt)(void *btcoexist, u8 map_type,
 
 typedef void (*bfp_btc_set_bt_reg)(void *btc_context, u8 reg_type, u32 offset,
 				   u32 value);
+typedef u32 (*bfp_btc_get_bt_reg)(void *btc_context, u8 reg_type, u32 offset);
 
 typedef void (*bfp_btc_disp_dbg_msg)(void *btcoexist, u8 disp_type,
 				     struct seq_file *m);
@@ -520,6 +533,7 @@ struct btc_bt_info {
 	u16 bt_hci_ver;
 	u16 bt_real_fw_ver;
 	u8 bt_fw_ver;
+	u32 bt_get_fw_ver;
 
 	bool bt_disable_low_pwr;
 
@@ -591,6 +605,7 @@ struct btc_bt_link_info {
 	bool pan_exist;
 	bool pan_only;
 	bool slave_role;
+	bool acl_busy;
 };
 
 enum btc_antenna_pos {
@@ -683,6 +698,7 @@ struct btc_coexist {
 	bfp_btc_set btc_set;
 
 	bfp_btc_set_bt_reg btc_set_bt_reg;
+	bfp_btc_get_bt_reg btc_get_bt_reg;
 
 	bfp_btc_get_bt_coex_supported_feature btc_get_bt_coex_supported_feature;
 	bfp_btc_get_bt_coex_supported_version btc_get_bt_coex_supported_version;
