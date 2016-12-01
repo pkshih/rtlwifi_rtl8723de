@@ -307,8 +307,13 @@ bool rtl8723e_rx_query_desc(struct ieee80211_hw *hw,
 
 	status->is_cck = RX_HAL_IS_CCK_RATE(status->rate);
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
 	rx_status->freq = hw->conf.chandef.chan->center_freq;
 	rx_status->band = hw->conf.chandef.chan->band;
+#else
+	rx_status->freq = hw->conf.channel->center_freq;
+	rx_status->band = hw->conf.channel->band;
+#endif
 
 	hdr = (struct ieee80211_hdr *)(skb->data + status->rx_drvinfo_size
 			+ status->rx_bufshift);

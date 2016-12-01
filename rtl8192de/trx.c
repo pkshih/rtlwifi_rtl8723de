@@ -496,8 +496,13 @@ bool rtl92de_rx_query_desc(struct ieee80211_hw *hw,	struct rtl_stats *stats,
 	stats->timestamp_low = GET_RX_DESC_TSFL(pdesc);
 	stats->rx_is40Mhzpacket = (bool) GET_RX_DESC_BW(pdesc);
 	stats->is_ht = (bool)GET_RX_DESC_RXHT(pdesc);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
 	rx_status->freq = hw->conf.chandef.chan->center_freq;
 	rx_status->band = hw->conf.chandef.chan->band;
+#else
+	rx_status->freq = hw->conf.channel->center_freq;
+	rx_status->band = hw->conf.channel->band;
+#endif
 	if (GET_RX_DESC_CRC32(pdesc))
 		rx_status->flag |= RX_FLAG_FAILED_FCS_CRC;
 	if (!GET_RX_DESC_SWDEC(pdesc))

@@ -282,8 +282,13 @@ bool rtl92se_rx_query_desc(struct ieee80211_hw *hw, struct rtl_stats *stats,
 	if (stats->hwerror)
 		return false;
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
 	rx_status->freq = hw->conf.chandef.chan->center_freq;
 	rx_status->band = hw->conf.chandef.chan->band;
+#else
+	rx_status->freq = hw->conf.channel->center_freq;
+	rx_status->band = hw->conf.channel->band;
+#endif
 
 	if (stats->crc)
 		rx_status->flag |= RX_FLAG_FAILED_FCS_CRC;
