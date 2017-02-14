@@ -8,3 +8,5 @@
 #define PHYDM_INFO_FA_CCK	"PHYDM_INFO_FA_CCK"
 #define PHYDM_INFO_CCA_OFDM	"PHYDM_INFO_CCA_OFDM"
 #define PHYDM_INFO_CCA_CCK	"PHYDM_INFO_CCA_CCK"
+
+#define delay_ms(ms)	mdelay(ms)
