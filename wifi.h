@@ -2887,6 +2887,7 @@ struct rtl_priv {
 	 * 92ee use new trx flow.
 	 */
 	bool use_new_trx_flow;
+	u8	mp_mode;
 
 #ifdef CONFIG_PM
 	struct wiphy_wowlan_support wowlan;

@@ -2309,6 +2309,9 @@ int rtl_pci_probe(struct pci_dev *pdev,
 	}
 	rtlpriv->mac80211.mac80211_registered = 1;
 
+	/* init mp flag */
+	rtlpriv->mp_mode = 0;
+
 	/* add for debug */
 	rtl_debug_add_one(hw);
 
