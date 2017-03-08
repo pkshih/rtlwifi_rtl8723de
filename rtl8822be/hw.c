@@ -495,6 +495,22 @@ void rtl8822be_set_hw_reg(struct ieee80211_hw *hw, u8 variable, u8 *val)
 		ampdu_len = (0x2000 << ampdu_len) - 1;
 		rtl_write_dword(rtlpriv, REG_AMPDU_MAX_LENGTH_8822B, ampdu_len);
 	} break;
+	case HW_VAR_AC_PARAM_VO:
+		rtl_write_dword(rtlpriv, REG_EDCA_VO_PARAM_8822B,
+				*((u32 *)val));
+		break;
+	case HW_VAR_AC_PARAM_VI:
+		rtl_write_dword(rtlpriv, REG_EDCA_VI_PARAM_8822B,
+				*((u32 *)val));
+		break;
+	case HW_VAR_AC_PARAM_BE:
+		rtl_write_dword(rtlpriv, REG_EDCA_BE_PARAM_8822B,
+				*((u32 *)val));
+		break;
+	case HW_VAR_AC_PARAM_BK:
+		rtl_write_dword(rtlpriv, REG_EDCA_BK_PARAM_8822B,
+				*((u32 *)val));
+		break;
 	case HW_VAR_AC_PARAM: {
 		u8 e_aci = *((u8 *)val);
 

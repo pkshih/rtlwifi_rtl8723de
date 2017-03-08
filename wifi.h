@@ -501,6 +501,11 @@ enum hw_variables {
 	HW_VAR_MGT_FILTER = 0x60,
 	HW_VAR_CTRL_FILTER = 0x61,
 	HW_VAR_DATA_FILTER = 0x62,
+
+	HW_VAR_AC_PARAM_VO = 0x63,
+	HW_VAR_AC_PARAM_VI = 0x64,
+	HW_VAR_AC_PARAM_BE = 0x65,
+	HW_VAR_AC_PARAM_BK = 0x66,
 };
 
 enum rt_media_status {
