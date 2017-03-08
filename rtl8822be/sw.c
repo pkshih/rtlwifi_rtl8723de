@@ -116,6 +116,7 @@ int rtl8822be_init_sw_vars(struct ieee80211_hw *hw)
 	rtlpriv->dm.dm_initialgain_enable = 1;
 	rtlpriv->dm.dm_flag = 0;
 	rtlpriv->dm.disable_framebursting = 0;
+	rtlpriv->dm.dis_turboedca = 0;
 	/*rtlpriv->dm.thermalvalue = 0;*/
 	rtlpriv->dm.useramask = 1; /* turn on RA */
 	rtlpci->transmit_config = CFENDFORM | BIT(15);

@@ -1188,6 +1188,9 @@ static void rtl_hal_turbo_edca(struct ieee80211_hw *hw)
 	u64 cur_rx_bytes = 0;
 	u8 is_bias_on_rx = false;
 
+	if (rtlpriv->dm.dis_turboedca)
+		return;
+
 	if (dm->wifi_test)
 		return;
 

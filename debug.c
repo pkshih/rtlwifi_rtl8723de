@@ -546,6 +546,43 @@ static const struct file_operations file_ops_common_rw = {
 	.write = rtl_debugfs_common_write,
 };
 
+static ssize_t rtl_debugfs_dis_turboedca(struct file *filp,
+					 const char __user *buffer,
+					 size_t count, loff_t *loff)
+{
+	struct rtl_debugfs_priv *debugfs_priv = filp->private_data;
+	struct rtl_priv *rtlpriv = debugfs_priv->rtlpriv;
+
+	unsigned long val;
+
+	if (count > 2 || !buffer)
+		return -EFAULT;
+
+	if (kstrtoul_from_user(buffer, count, 16, &val))
+		return count;
+
+	rtlpriv->dm.dis_turboedca = (val ? true : false);
+
+	return count;
+}
+
+static int rtl_debug_get_dis_turboedca(struct seq_file *m, void *v)
+{
+	struct rtl_debugfs_priv *debugfs_priv = m->private;
+	struct rtl_priv *rtlpriv = debugfs_priv->rtlpriv;
+
+	seq_printf(m, "Turbo EDCA is %s\n",
+		   rtlpriv->dm.dis_turboedca ? "Disable" : "Enable");
+
+	return 0;
+}
+
+static struct rtl_debugfs_priv rtl_debug_priv_dis_turboedca = {
+	.cb_read = rtl_debug_get_dis_turboedca,
+	.cb_write = rtl_debugfs_dis_turboedca,
+	.cb_data = 0,
+};
+
 #define RTL_DEBUGFS_ADD_CORE(name, mode, fopname)			   \
 	do {								   \
 		rtl_debug_priv_ ##name.rtlpriv = rtlpriv;		   \
@@ -631,6 +668,7 @@ void rtl_debug_add_one(struct ieee80211_hw *hw)
 	RTL_DEBUGFS_ADD_W(write_rfreg);
 
 	RTL_DEBUGFS_ADD_RW(phydm_cmd);
+	RTL_DEBUGFS_ADD_RW(dis_turboedca);
 }
 EXPORT_SYMBOL_GPL(rtl_debug_add_one);
 

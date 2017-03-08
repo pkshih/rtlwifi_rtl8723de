@@ -1726,6 +1726,7 @@ struct rtl_dm {
 	s32 ofdm_pkt_cnt;
 	bool dm_initialgain_enable;
 	bool dynamic_txpower_enable;
+	bool dis_turboedca;
 	bool current_turbo_edca;
 	bool is_any_nonbepkts;	/*out dm */
 	bool is_cur_rdlstate;
