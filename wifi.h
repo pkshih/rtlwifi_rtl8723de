@@ -1343,7 +1343,7 @@ struct rtl_sta_info {
 	struct rtl_tid_data tids[MAX_TID_COUNT];
 	/* just used for ap adhoc or mesh*/
 	struct rssi_sta rssi_stat;
-	struct cmn_sta_info sta_info_cmn;
+	struct cmn_sta_info cmn_info;
 	u8 rssi_level;
 	u16 wireless_mode;
 	u8 ratr_index;

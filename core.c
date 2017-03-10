@@ -942,6 +942,9 @@ static int rtl_op_sta_add(struct ieee80211_hw *hw,
 			sta->supp_rates[0] &= 0xfffffff0;
 
 		memcpy(sta_entry->mac_addr, sta->addr, ETH_ALEN);
+
+		sta_entry->cmn_info.bw_mode = rtlphy->current_chan_bw;
+		memcpy(sta_entry->cmn_info.mac_addr, sta->addr, ETH_ALEN);
 		RT_TRACE(rtlpriv, COMP_MAC80211, DBG_DMESG,
 			"Add sta addr is %pM\n", sta->addr);
 		rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0, true);
@@ -1112,6 +1115,7 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 		u8 mstatus;
 		if (bss_conf->assoc) {
 			struct ieee80211_sta *sta = NULL;
+			struct rtl_sta_info *sta_entry = NULL;
 			u8 keep_alive = 10;
 
 			mstatus = RT_MEDIA_CONNECT;
@@ -1139,6 +1143,10 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 				rcu_read_unlock();
 				goto out;
 			}
+
+			sta_entry = (struct rtl_sta_info *)sta->drv_priv;
+			sta_entry->cmn_info.aid = mac->assoc_id;
+
 			RT_TRACE(rtlpriv, COMP_EASY_CONCURRENT, DBG_LOUD,
 				 "send PS STATIC frame\n");
 			if (rtlpriv->dm.supp_phymode_switch) {
