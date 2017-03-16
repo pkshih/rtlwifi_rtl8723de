@@ -101,7 +101,8 @@ static struct ieee80211_channel rtl_channeltable_5g[] = {
 	{.center_freq = 5765, .hw_value = 153,},
 	{.center_freq = 5785, .hw_value = 157,},
 	{.center_freq = 5805, .hw_value = 161,},
-	{.center_freq = 5825, .hw_value = 165,},
+	{.center_freq = 5825, .hw_value = 165,
+	 .flags = IEEE80211_CHAN_NO_HT40MINUS},
 };
 
 static struct ieee80211_rate rtl_ratetable_2g[] = {
