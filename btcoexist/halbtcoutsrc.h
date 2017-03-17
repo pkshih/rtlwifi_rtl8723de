@@ -492,6 +492,9 @@ typedef u8 (*bfp_btc_get_ble_scan_type_from_bt)(void *btcoexist);
 
 typedef u32 (*bfp_btc_get_ble_scan_para_from_bt)(void *btcoexist, u8 scan_type);
 
+typedef bool (*bfp_btc_get_bt_afh_map_from_bt)(void *btcoexist, u8 map_type,
+					       u8 *afh_map);
+
 typedef void (*bfp_btc_set_bt_reg)(void *btc_context, u8 reg_type, u32 offset,
 				   u32 value);
 
@@ -530,6 +533,9 @@ struct btc_bt_info {
 	u8 rpwm_val;
 	u32 ra_mask;
 
+	u32 afh_map_l;
+	u32 afh_map_m;
+	u16 afh_map_h;
 	u32 bt_supported_feature;
 	u32 bt_supported_version;
 	u32 bt_device_info;
@@ -597,6 +603,9 @@ enum btc_mp_h2c_op_code {
 	BT_OP_WRITE_REG_ADDR			= 12,
 	BT_OP_WRITE_REG_VALUE			= 13,
 	BT_OP_READ_REG				= 17,
+	BT_OP_GET_AFH_MAP_L			= 30,
+	BT_OP_GET_AFH_MAP_M			= 31,
+	BT_OP_GET_AFH_MAP_H			= 32,
 	BT_OP_GET_BT_COEX_SUPPORTED_FEATURE	= 42,
 	BT_OP_GET_BT_COEX_SUPPORTED_VERSION	= 43,
 	BT_OP_GET_BT_ANT_DET_VAL		= 44,
@@ -611,6 +620,9 @@ enum btc_mp_h2c_req_num {
 	/* 4 bits only */
 	BT_SEQ_DONT_CARE			= 0,
 	BT_SEQ_GET_BT_VERSION			= 0xE,
+	BT_SEQ_GET_AFH_MAP_L			= 0x5,
+	BT_SEQ_GET_AFH_MAP_M			= 0x6,
+	BT_SEQ_GET_AFH_MAP_H			= 0x9,
 	BT_SEQ_GET_BT_COEX_SUPPORTED_FEATURE	= 0x7,
 	BT_SEQ_GET_BT_COEX_SUPPORTED_VERSION	= 0x8,
 	BT_SEQ_GET_BT_ANT_DET_VAL		= 0x2,
@@ -678,6 +690,8 @@ struct btc_coexist {
 	bfp_btc_get_ant_det_val_from_bt btc_get_ant_det_val_from_bt;
 	bfp_btc_get_ble_scan_type_from_bt btc_get_ble_scan_type_from_bt;
 	bfp_btc_get_ble_scan_para_from_bt btc_get_ble_scan_para_from_bt;
+	bfp_btc_get_bt_afh_map_from_bt btc_get_bt_afh_map_from_bt;
+
 };
 
 bool halbtc_is_wifi_uplink(struct rtl_priv *adapter);

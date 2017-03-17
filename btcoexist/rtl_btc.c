@@ -341,6 +341,7 @@ void rtl_btc_btmpinfo_notify(struct rtl_priv *rtlpriv, u8 *tmp_buf, u8 length)
 	u8 extid, seq, len;
 	u16 bt_real_fw_ver;
 	u8 bt_fw_ver;
+	u8 *data;
 
 	if (!btcoexist)
 		return;
@@ -355,6 +356,7 @@ void rtl_btc_btmpinfo_notify(struct rtl_priv *rtlpriv, u8 *tmp_buf, u8 length)
 
 	len = tmp_buf[1] >> 4;
 	seq = tmp_buf[2] >> 4;
+	data = &tmp_buf[3];
 
 	/* BT Firmware version response */
 	switch (seq) {
@@ -364,6 +366,15 @@ void rtl_btc_btmpinfo_notify(struct rtl_priv *rtlpriv, u8 *tmp_buf, u8 length)
 
 		btcoexist->bt_info.bt_real_fw_ver = bt_real_fw_ver;
 		btcoexist->bt_info.bt_fw_ver = bt_fw_ver;
+		break;
+	case BT_SEQ_GET_AFH_MAP_L:
+		btcoexist->bt_info.afh_map_l = le32_to_cpu(*(__le32 *)data);
+		break;
+	case BT_SEQ_GET_AFH_MAP_M:
+		btcoexist->bt_info.afh_map_m = le32_to_cpu(*(__le32 *)data);
+		break;
+	case BT_SEQ_GET_AFH_MAP_H:
+		btcoexist->bt_info.afh_map_h = le16_to_cpu(*(__le16 *)data);
 		break;
 	case BT_SEQ_GET_BT_COEX_SUPPORTED_FEATURE:
 		btcoexist->bt_info.bt_supported_feature = tmp_buf[3] |

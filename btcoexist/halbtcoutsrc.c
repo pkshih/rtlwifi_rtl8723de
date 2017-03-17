@@ -246,6 +246,15 @@ bool halbtc_send_bt_mp_operation(struct btc_coexist *btcoexist, u8 op_code,
 	case BT_OP_GET_BT_VERSION:
 		req_num = BT_SEQ_GET_BT_VERSION;
 		break;
+	case BT_OP_GET_AFH_MAP_L:
+		req_num = BT_SEQ_GET_AFH_MAP_L;
+		break;
+	case BT_OP_GET_AFH_MAP_M:
+		req_num = BT_SEQ_GET_AFH_MAP_M;
+		break;
+	case BT_OP_GET_AFH_MAP_H:
+		req_num = BT_SEQ_GET_AFH_MAP_H;
+		break;
 	case BT_OP_GET_BT_COEX_SUPPORTED_FEATURE:
 		req_num = BT_SEQ_GET_BT_COEX_SUPPORTED_FEATURE;
 		break;
@@ -1209,6 +1218,44 @@ static u32 halbtc_get_ble_scan_para_from_bt(void *btc_context, u8 scan_type)
 	return btcoexist->bt_info.bt_ble_scan_para;
 }
 
+static bool halbtc_get_bt_afh_map_from_bt(void *btc_context, u8 map_type,
+					   u8 *afh_map)
+{
+	struct btc_coexist *btcoexist = (struct btc_coexist *)btc_context;
+	u8 cmd_buffer[2] = {0};
+	bool ret;
+	u32 *afh_map_l = (u32 *)afh_map;
+	u32 *afh_map_m = (u32 *)(afh_map + 4);
+	u16 *afh_map_h = (u16 *)(afh_map + 8);
+
+	/* cmd_buffer[0] and [1] is filled by halbtc_send_bt_mp_operation() */
+	ret = halbtc_send_bt_mp_operation(btcoexist, BT_OP_GET_AFH_MAP_L,
+					  cmd_buffer, 2, 200);
+	if (!ret)
+		goto exit;
+
+	*afh_map_l = btcoexist->bt_info.afh_map_l;
+
+	/* cmd_buffer[0] and [1] is filled by halbtc_send_bt_mp_operation() */
+	ret = halbtc_send_bt_mp_operation(btcoexist, BT_OP_GET_AFH_MAP_M,
+					  cmd_buffer, 2, 200);
+	if (!ret)
+		goto exit;
+
+	*afh_map_m = btcoexist->bt_info.afh_map_m;
+
+	/* cmd_buffer[0] and [1] is filled by halbtc_send_bt_mp_operation() */
+	ret = halbtc_send_bt_mp_operation(btcoexist, BT_OP_GET_AFH_MAP_H,
+					  cmd_buffer, 2, 200);
+	if (!ret)
+		goto exit;
+
+	*afh_map_h = btcoexist->bt_info.afh_map_h;
+
+exit:
+	return ret;
+}
+
 /*****************************************************************
  *         Extern functions called by other module
  *****************************************************************/
@@ -1261,6 +1308,8 @@ bool exhalbtc_initlize_variables(struct rtl_priv *rtlpriv)
 					halbtc_get_ble_scan_type_from_bt;
 	btcoexist->btc_get_ble_scan_para_from_bt =
 					halbtc_get_ble_scan_para_from_bt;
+	btcoexist->btc_get_bt_afh_map_from_bt =
+					halbtc_get_bt_afh_map_from_bt;
 
 	init_completion(&btcoexist->bt_mp_comp);
 
