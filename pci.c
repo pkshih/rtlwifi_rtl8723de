@@ -855,6 +855,10 @@ static void _rtl_pci_rx_interrupt(struct ieee80211_hw *hw)
 				unicast = true;
 				rtlpriv->stats.rxbytesunicast += skb->len;
 			}
+
+			if (rtlpriv->sta)
+				rtlpriv->sta->rxbytes += skb->len;
+
 			rtl_is_special_data(hw, skb, false, true);
 
 			if (ieee80211_is_data(fc)) {

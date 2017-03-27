@@ -1341,6 +1341,9 @@ struct rtl_sta_info {
 	u64 txbytes;	/* total tx bytes */
 	u64 last_txbytes;
 	u64 txbytes_inperiod;
+	u64 rxbytes;	/* total rx bytes */
+	u64 last_rxbytes;
+	u64 rxbytes_inperiod;
 } __packed;
 
 struct rtl_priv;
