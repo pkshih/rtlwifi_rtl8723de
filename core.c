@@ -992,6 +992,15 @@ static int _rtl_get_hal_qnum(u16 queue)
 	return qnum;
 }
 
+static void rtl_op_sta_statistics(struct ieee80211_hw *hw,
+				  struct ieee80211_vif *vif,
+				  struct ieee80211_sta *sta,
+				  struct station_info *sinfo)
+{
+	/* nothing filled by driver, so mac80211 will update all info */
+	sinfo->filled = 0;
+}
+
 /*
  *for mac80211 VO = 0, VI = 1, BE = 2, BK = 3
  *for rtl819x  BE = 0, BK = 1, VI = 2, VO = 3
@@ -1878,6 +1887,7 @@ const struct ieee80211_ops rtl_ops = {
 	.config = rtl_op_config,
 	.configure_filter = rtl_op_configure_filter,
 	.set_key = rtl_op_set_key,
+	.sta_statistics = rtl_op_sta_statistics,
 	.conf_tx = rtl_op_conf_tx,
 	.bss_info_changed = rtl_op_bss_info_changed,
 	.get_tsf = rtl_op_get_tsf,
