@@ -386,7 +386,9 @@ MODULE_FIRMWARE("rtlwifi/rtl8723efw.bin");
 
 module_param_named(swenc, rtl8723e_mod_params.sw_crypto, bool, 0444);
 module_param_named(debug_level, rtl8723e_mod_params.debug_level, int, 0644);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0))
 module_param_named(debug_mask, rtl8723e_mod_params.debug_mask, ullong, 0644);
+#endif
 module_param_named(ips, rtl8723e_mod_params.inactiveps, bool, 0444);
 module_param_named(swlps, rtl8723e_mod_params.swctrl_lps, bool, 0444);
 module_param_named(fwlps, rtl8723e_mod_params.fwctrl_lps, bool, 0444);
