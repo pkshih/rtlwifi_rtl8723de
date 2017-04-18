@@ -328,8 +328,8 @@ static struct rtl_mod_params rtl8822be_mod_params = {
 	.dma64 = false,
 	.aspm_support = 1,
 	.disable_watchdog = false,
-	.debug_level = 0,
-	.debug_mask = 0,
+	.debug_level = 3,//DBG_EMERG,
+	.debug_mask = 0xffffffffffffffffULL,
 };
 
 static struct rtl_hal_cfg rtl8822be_hal_cfg = {
