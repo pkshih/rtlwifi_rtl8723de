@@ -543,6 +543,11 @@ MODULE_AUTHOR("Larry Finger	<Larry.FInger@lwfinger.net>");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Realtek 802.11n PCI wireless core");
 
+#if 0
+module_param_named(manual_control, gl_bt_coexist.manual_control, bool, 0644);
+MODULE_PARM_DESC(manual_control, "Set to 1 to disable btcoex (default 0)\n");
+#endif
+
 static int __init rtl_btcoexist_module_init(void)
 {
 	return 0;
