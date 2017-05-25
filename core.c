@@ -1091,6 +1091,7 @@ static int _rtl_get_hal_qnum(u16 queue)
 	return qnum;
 }
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
 static void rtl_op_sta_statistics(struct ieee80211_hw *hw,
 				  struct ieee80211_vif *vif,
 				  struct ieee80211_sta *sta,
@@ -1099,6 +1100,7 @@ static void rtl_op_sta_statistics(struct ieee80211_hw *hw,
 	/* nothing filled by driver, so mac80211 will update all info */
 	sinfo->filled = 0;
 }
+#endif
 
 static int rtl_op_set_frag_threshold(struct ieee80211_hw *hw, u32 value)
 {
@@ -2239,7 +2241,9 @@ const struct ieee80211_ops rtl_ops = {
 	.config = rtl_op_config,
 	.configure_filter = rtl_op_configure_filter,
 	.set_key = rtl_op_set_key,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
 	.sta_statistics = rtl_op_sta_statistics,
+#endif
 	.set_frag_threshold = rtl_op_set_frag_threshold,
 	.conf_tx = rtl_op_conf_tx,
 	.bss_info_changed = rtl_op_bss_info_changed,
