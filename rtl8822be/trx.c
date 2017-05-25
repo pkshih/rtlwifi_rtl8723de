@@ -611,6 +611,10 @@ static u8 rtl8822be_sc_mapping(struct ieee80211_hw *hw,
 	return sc_setting_of_desc;
 }
 
+#include <linux/module.h>
+int fix_rate = -1;
+module_param_named(fix_rate, fix_rate, int, 0644);
+
 void rtl8822be_tx_fill_desc(struct ieee80211_hw *hw, struct ieee80211_hdr *hdr,
 			    u8 *pdesc_tx, u8 *pbd_desc_tx,
 			    struct ieee80211_tx_info *info,
@@ -762,6 +766,12 @@ void rtl8822be_tx_fill_desc(struct ieee80211_hw *hw, struct ieee80211_hdr *hdr,
 			/*SET_TX_DESC_RTS_RATE(pdesc, 0x08); */
 			/* SET_TX_DESC_TX_RATE(pdesc, 0x0b); */
 		}
+
+		if (fix_rate >= 0) {
+			SET_TX_DESC_USE_RATE(pdesc, 1);
+			SET_TX_DESC_DATARATE(pdesc, fix_rate);
+		}
+
 		if (ieee80211_is_data_qos(fc)) {
 			if (mac->rdg_en) {
 				RT_TRACE(rtlpriv, COMP_SEND, DBG_TRACE,
