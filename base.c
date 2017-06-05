@@ -507,8 +507,10 @@ static void _rtl_init_mac80211(struct ieee80211_hw *hw)
 	ieee80211_hw_set(hw, CONNECTION_MONITOR);
 	ieee80211_hw_set(hw, MFP_CAPABLE);
 	ieee80211_hw_set(hw, REPORTS_TX_ACK_STATUS);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0))
 	ieee80211_hw_set(hw, SUPPORTS_TX_FRAG);
 	ieee80211_hw_set(hw, SUPPORT_FAST_XMIT);
+#endif
 	ieee80211_hw_set(hw, SUPPORTS_AMSDU_IN_AMPDU);
 
 	/* swlps or hwlps has been set in diff chip in init_sw_vars */
