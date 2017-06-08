@@ -968,7 +968,8 @@ static irqreturn_t _rtl_pci_interrupt(int irq, void *dev_id)
 	}
 
 	/*<2> Tx related */
-	if (unlikely(intvec.intb & rtlpriv->cfg->maps[RTL_IMR_TXFOVW]))
+	if (unlikely(intvec.intb & rtlpriv->cfg->maps[RTL_IMR_TXFOVW]) &&
+	    printk_ratelimit())
 		RT_TRACE(rtlpriv, COMP_ERR, DBG_WARNING, "IMR_TXFOVW!\n");
 
 	if (intvec.inta & rtlpriv->cfg->maps[RTL_IMR_MGNTDOK]) {
