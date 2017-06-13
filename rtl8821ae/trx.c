@@ -525,11 +525,15 @@ bool rtl8821ae_rx_query_desc(struct ieee80211_hw *hw,
 		rx_status->flag |= RX_FLAG_FAILED_FCS_CRC;
 
 	if (status->rx_packet_bw == HT_CHANNEL_WIDTH_20_40)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->bw = RATE_INFO_BW_40;
+#else
+		rx_status->flag |= RX_FLAG_40MHZ;
+#endif
 	else if (status->rx_packet_bw == HT_CHANNEL_WIDTH_80)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->bw = RATE_INFO_BW_80;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
 		rx_status->vht_flag |= RX_VHT_FLAG_80MHZ;
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
 		rx_status->flag |= RX_FLAG_80MHZ;
@@ -554,7 +558,11 @@ bool rtl8821ae_rx_query_desc(struct ieee80211_hw *hw,
 #endif
 
 	if (status->is_short_gi)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->enc_flags |= RX_ENC_FLAG_SHORT_GI;
+#else
+		rx_status->flag |= RX_FLAG_SHORT_GI;
+#endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 	rx_status->nss = status->vht_nss;

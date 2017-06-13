@@ -369,10 +369,18 @@ bool rtl92ce_rx_query_desc(struct ieee80211_hw *hw,
 		rx_status->flag |= RX_FLAG_FAILED_FCS_CRC;
 
 	if (stats->rx_is40Mhzpacket)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->bw = RATE_INFO_BW_40;
+#else
+		rx_status->flag |= RX_FLAG_40MHZ;
+#endif
 
 	if (stats->is_ht)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->encoding = RX_ENC_HT;
+#else
+		rx_status->flag |= RX_FLAG_HT;
+#endif
 
 	rx_status->flag |= RX_FLAG_MACTIME_START;
 
