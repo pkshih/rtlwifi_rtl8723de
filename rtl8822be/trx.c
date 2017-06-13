@@ -252,8 +252,13 @@ bool rtl8822be_rx_query_desc(struct ieee80211_hw *hw, struct rtl_stats *status,
 		RT_TRACE(rtlpriv, COMP_RXDESC, DBG_LOUD,
 			 "GGGGGGGGGGGGGet Wakeup Packet!! WakeMatch=%d\n",
 			 status->wake_match);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,0))
 	rx_status->freq = hw->conf.chandef.chan->center_freq;
 	rx_status->band = hw->conf.chandef.chan->band;
+#else
+	rx_status->freq = hw->conf.channel->center_freq;
+	rx_status->band = hw->conf.channel->band;
+#endif
 
 	if (phystatus)
 		p_phystrpt = (skb->data + status->rx_bufshift + 24);
@@ -265,11 +270,25 @@ bool rtl8822be_rx_query_desc(struct ieee80211_hw *hw, struct rtl_stats *status,
 		rx_status->flag |= RX_FLAG_FAILED_FCS_CRC;
 
 	if (status->is_ht)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->encoding = RX_ENC_HT;
+#else
+		rx_status->flag |= RX_FLAG_HT;
+#endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
 	if (status->is_vht)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->encoding = RX_ENC_VHT;
+#else
+		rx_status->flag |= RX_FLAG_VHT;
+#endif
+#endif
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 	rx_status->nss = status->vht_nss;
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+	rx_status->vht_nss = status->vht_nss;
+#endif
 
 	rx_status->flag |= RX_FLAG_MACTIME_START;
 
@@ -290,7 +309,13 @@ bool rtl8822be_rx_query_desc(struct ieee80211_hw *hw, struct rtl_stats *status,
 			return false;
 		}
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,15,0)) ||	\
+    ((LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0)) &&	\
+    defined(UTS_UBUNTU_RELEASE_ABI))
 		if ((!_ieee80211_is_robust_mgmt_frame(hdr)) &&
+#else
+		if ((!ieee80211_is_robust_mgmt_frame(hdr)) &&
+#endif
 		    (ieee80211_has_protected(hdr->frame_control)))
 			rx_status->flag |= RX_FLAG_DECRYPTED;
 		else
@@ -318,9 +343,21 @@ bool rtl8822be_rx_query_desc(struct ieee80211_hw *hw, struct rtl_stats *status,
 	rx_status->signal = status->recvsignalpower;
 
 	if (status->rx_packet_bw == HT_CHANNEL_WIDTH_20_40)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->bw = RATE_INFO_BW_40;
+#else
+		rx_status->flag |= RX_FLAG_40MHZ;
+#endif
 	else if (status->rx_packet_bw == HT_CHANNEL_WIDTH_80)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0))
 		rx_status->bw = RATE_INFO_BW_80;
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
+		rx_status->vht_flag |= RX_VHT_FLAG_80MHZ;
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+		rx_status->flag |= RX_FLAG_80MHZ;
+#else
+		;
+#endif
 
 label_no_physt:
 
