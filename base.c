@@ -318,6 +318,68 @@ static void _rtl_init_hw_vht_capab(struct ieee80211_hw *hw,
 		vht_cap->cap = rtlpriv->cfg->vht_cap_info;
 }
 
+#define OUI_REALTEK	0x00E04C
+
+enum {
+	RTL_VENDOR_SCMD_COEX_AP_NUM	= 2000,
+};
+
+static u32 rtl_data_to_int(struct rtl_priv *rtlpriv, const void *data, int len)
+{
+	/*
+	 * wpa_supplicant translates the string '01234567' to binary as
+	 * '01 23 45 67', so we treat it as big-endian.
+	 */
+	u32 tmp = 0;
+
+	switch (len) {
+	case 1:
+		tmp = *((u8 *)data);
+		break;
+	case 2:
+		tmp = be16_to_cpu(*((__be16 *)data));
+		break;
+	case 4:
+		tmp = be32_to_cpu(*((__be32 *)data));
+		break;
+	default:
+		RT_TRACE(rtlpriv, COMP_VENDOR_CMD, DBG_WARNING,
+			 "length of vendor command is %d\n", len);
+		break;
+	}
+
+	return tmp;
+}
+
+static int rtl_cfgvendor_coex_ap_num(struct wiphy *wiphy,
+				     struct wireless_dev *wdev,
+				     const void *data, int len)
+{
+	struct ieee80211_hw *hw = wiphy_to_ieee80211_hw(wiphy);
+	struct rtl_priv *rtlpriv = rtl_priv(hw);
+
+	rtlpriv->btcoexist.btc_info.ap_num =
+					rtl_data_to_int(rtlpriv, data, len);
+
+	RT_TRACE(rtlpriv, COMP_VENDOR_CMD, DBG_DMESG,
+		 "cfgvendor ap_num is %d\n",
+		 rtlpriv->btcoexist.btc_info.ap_num);
+
+	return 0;
+}
+
+static const struct wiphy_vendor_command rtl_vendor_cmds[] = {
+	{
+		{
+			.vendor_id = OUI_REALTEK,
+			.subcmd = RTL_VENDOR_SCMD_COEX_AP_NUM
+		},
+		.flags = WIPHY_VENDOR_CMD_NEED_WDEV |
+			 WIPHY_VENDOR_CMD_NEED_NETDEV,
+		.doit = rtl_cfgvendor_coex_ap_num,
+	},
+};
+
 static void _rtl_init_mac80211(struct ieee80211_hw *hw)
 {
 	struct rtl_priv *rtlpriv = rtl_priv(hw);
@@ -325,6 +387,9 @@ static void _rtl_init_mac80211(struct ieee80211_hw *hw)
 	struct rtl_mac *rtlmac = rtl_mac(rtl_priv(hw));
 	struct rtl_efuse *rtlefuse = rtl_efuse(rtl_priv(hw));
 	struct ieee80211_supported_band *sband;
+
+	hw->wiphy->vendor_commands = rtl_vendor_cmds;
+	hw->wiphy->n_vendor_commands = ARRAY_SIZE(rtl_vendor_cmds);
 
 	if (rtlhal->macphymode == SINGLEMAC_SINGLEPHY &&
 	    rtlhal->bandset == BAND_ON_BOTH) {
