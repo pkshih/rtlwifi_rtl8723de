@@ -2131,7 +2131,8 @@ static int _rtl8821ae_set_media_status(struct ieee80211_hw *hw,
 		_rtl8821ae_stop_tx_beacon(hw);
 		_rtl8821ae_enable_bcn_sub_func(hw);
 	} else if (type == NL80211_IFTYPE_ADHOC ||
-		type == NL80211_IFTYPE_AP) {
+		   type == NL80211_IFTYPE_AP ||
+		   type == NL80211_IFTYPE_MESH_POINT) {
 		_rtl8821ae_resume_tx_beacon(hw);
 		_rtl8821ae_disable_bcn_sub_func(hw);
 	} else {
@@ -2148,6 +2149,7 @@ static int _rtl8821ae_set_media_status(struct ieee80211_hw *hw,
 			 "Set Network type to NO LINK!\n");
 		break;
 	case NL80211_IFTYPE_ADHOC:
+	case NL80211_IFTYPE_MESH_POINT:
 		bt_msr |= MSR_ADHOC;
 		RT_TRACE(rtlpriv, COMP_INIT, DBG_TRACE,
 			 "Set Network type to Ad Hoc!\n");
@@ -2210,7 +2212,8 @@ int rtl8821ae_set_network_type(struct ieee80211_hw *hw, enum nl80211_iftype type
 		return -EOPNOTSUPP;
 
 	if (rtlpriv->mac80211.link_state == MAC80211_LINKED) {
-		if (type != NL80211_IFTYPE_AP)
+		if (type != NL80211_IFTYPE_AP &&
+		    type != NL80211_IFTYPE_MESH_POINT)
 			rtl8821ae_set_check_bssid(hw, true);
 	} else {
 		rtl8821ae_set_check_bssid(hw, false);
