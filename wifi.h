@@ -859,6 +859,19 @@ enum wireless_mode {
 #define IS_WIRELESS_MODE_N_5G(wirelessmode)	\
 	(wirelessmode == WIRELESS_MODE_N_5G)
 
+static inline bool rtl_wireless_mode_is_vht(enum wireless_mode mode)
+{
+	switch (mode) {
+	case WIRELESS_MODE_AC_5G:
+	case WIRELESS_MODE_AC_24G:
+	case WIRELESS_MODE_AC_ONLY:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
 enum ratr_table_mode {
 	RATR_INX_WIRELESS_NGB = 0,
 	RATR_INX_WIRELESS_NG = 1,

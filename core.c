@@ -967,6 +967,24 @@ static int rtl_op_sta_add(struct ieee80211_hw *hw,
 		memcpy(sta_entry->cmn_info.mac_addr, sta->addr, ETH_ALEN);
 		RT_TRACE(rtlpriv, COMP_MAC80211, DBG_DMESG,
 			"Add sta addr is %pM\n", sta->addr);
+
+		/*update stbc/ldpc in cmn sta info*/
+		if (rtl_wireless_mode_is_vht(sta_entry->wireless_mode)) {
+			if (sta->vht_cap.cap & IEEE80211_VHT_CAP_RXSTBC_MASK)
+				sta_entry->cmn_info.stbc_en = 0x2;
+			if (sta->vht_cap.cap & IEEE80211_VHT_CAP_RXLDPC)
+				sta_entry->cmn_info.ldpc_en = 0x2;
+		} else {
+			if (sta->ht_cap.cap & IEEE80211_HT_CAP_RX_STBC)
+				sta_entry->cmn_info.stbc_en = 0x1;
+			if (sta->ht_cap.cap & IEEE80211_HT_CAP_LDPC_CODING)
+				sta_entry->cmn_info.ldpc_en = 0x1;
+		}
+		RT_TRACE(rtlpriv, COMP_MAC80211, DBG_DMESG,
+			 "STA cmn_info.stbc_en=%d cmn_info.ldpc_en=%d\n",
+			 sta_entry->cmn_info.stbc_en,
+			 sta_entry->cmn_info.ldpc_en);
+
 		rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0, true);
 
 		if (rtlpriv->phydm.ops) {
