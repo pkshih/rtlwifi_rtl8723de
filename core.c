@@ -998,6 +998,7 @@ static int rtl_op_sta_remove(struct ieee80211_hw *hw,
 		sta_entry = (struct rtl_sta_info *)sta->drv_priv;
 		sta_entry->wireless_mode = 0;
 		sta_entry->ratr_index = 0;
+		sta_entry->cmn_info.ra_info.rate_id = 0;
 		sta_entry->rtlpriv = NULL;
 		spin_lock_bh(&rtlpriv->locks.entry_list_lock);
 		list_del(&sta_entry->list);
