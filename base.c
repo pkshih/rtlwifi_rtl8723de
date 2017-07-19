@@ -2319,6 +2319,20 @@ int rtl_send_smps_action(struct ieee80211_hw *hw,
 		struct rtl_sta_info *sta_entry =
 			(struct rtl_sta_info *) sta->drv_priv;
 		sta_entry->mimo_ps = smps;
+
+		if (smps == IEEE80211_SMPS_STATIC)
+			sta_entry->cmn_info.sm_ps = SM_PS_STATIC;
+		else if (smps == IEEE80211_SMPS_OFF)
+			sta_entry->cmn_info.sm_ps = SM_PS_DISABLE;
+		else if (smps == IEEE80211_SMPS_DYNAMIC)
+			sta_entry->cmn_info.sm_ps = SM_PS_DYNAMIC;
+		else {
+			sta_entry->cmn_info.sm_ps = SM_PS_INVALID;
+			RT_TRACE(rtlpriv, COMP_ERR, DBG_WARNING,
+				 "Error!get smps=%d, set cmn_info.sm_ps to SM_PS_INVALID\n",
+				 smps);
+		}
+
 		/* rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0, true); */
 
 		info->control.rates[0].idx = 0;
