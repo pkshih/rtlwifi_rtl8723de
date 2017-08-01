@@ -278,6 +278,8 @@ enum btc_get_type {
 	BTC_GET_U4_VENDOR,
 	BTC_GET_U4_SUPPORTED_VERSION,
 	BTC_GET_U4_SUPPORTED_FEATURE,
+	BTC_GET_U4_BT_DEVICE_INFO,
+	BTC_GET_U4_BT_FORBIDDEN_SLOT_VAL,
 	BTC_GET_U4_WIFI_IQK_TOTAL,
 	BTC_GET_U4_WIFI_IQK_OK,
 	BTC_GET_U4_WIFI_IQK_FAIL,
@@ -459,6 +461,16 @@ typedef	bool (*bfp_btc_get)(void *btcoexist, u8 get_type, void *out_buf);
 
 typedef	bool (*bfp_btc_set)(void *btcoexist, u8 set_type, void *in_buf);
 
+typedef u32 (*bfp_btc_get_bt_coex_supported_feature)(void *btcoexist);
+
+typedef u32 (*bfp_btc_get_bt_coex_supported_version)(void *btcoexist);
+
+typedef u8 (*bfp_btc_get_ant_det_val_from_bt)(void *btcoexist);
+
+typedef u8 (*bfp_btc_get_ble_scan_type_from_bt)(void *btcoexist);
+
+typedef u32 (*bfp_btc_get_ble_scan_para_from_bt)(void *btcoexist, u8 scan_type);
+
 typedef void (*bfp_btc_set_bt_reg)(void *btc_context, u8 reg_type, u32 offset,
 				   u32 value);
 
@@ -496,6 +508,14 @@ struct btc_bt_info {
 	u8 lps_val;
 	u8 rpwm_val;
 	u32 ra_mask;
+
+	u32 bt_supported_feature;
+	u32 bt_supported_version;
+	u32 bt_device_info;
+	u32 bt_forb_slot_val;
+	u8 bt_ant_det_val;
+	u8 bt_ble_scan_type;
+	u32 bt_ble_scan_para;
 };
 
 struct btc_stack_info {
@@ -551,6 +571,34 @@ enum btc_antenna_pos {
 	BTC_ANTENNA_AT_AUX_PORT = 0x2,
 };
 
+enum btc_mp_h2c_op_code {
+	BT_OP_GET_BT_VERSION			= 0,
+	BT_OP_WRITE_REG_ADDR			= 12,
+	BT_OP_WRITE_REG_VALUE			= 13,
+	BT_OP_READ_REG				= 17,
+	BT_OP_GET_BT_COEX_SUPPORTED_FEATURE	= 42,
+	BT_OP_GET_BT_COEX_SUPPORTED_VERSION	= 43,
+	BT_OP_GET_BT_ANT_DET_VAL		= 44,
+	BT_OP_GET_BT_BLE_SCAN_PARA		= 45,
+	BT_OP_GET_BT_BLE_SCAN_TYPE		= 46,
+	BT_OP_GET_BT_DEVICE_INFO		= 48,
+	BT_OP_GET_BT_FORBIDDEN_SLOT_VAL		= 49,
+	BT_OP_MAX
+};
+
+enum btc_mp_h2c_req_num {
+	/* 4 bits only */
+	BT_SEQ_DONT_CARE			= 0,
+	BT_SEQ_GET_BT_VERSION			= 0xE,
+	BT_SEQ_GET_BT_COEX_SUPPORTED_FEATURE	= 0x7,
+	BT_SEQ_GET_BT_COEX_SUPPORTED_VERSION	= 0x8,
+	BT_SEQ_GET_BT_ANT_DET_VAL		= 0x2,
+	BT_SEQ_GET_BT_BLE_SCAN_PARA		= 0x3,
+	BT_SEQ_GET_BT_BLE_SCAN_TYPE		= 0x4,
+	BT_SEQ_GET_BT_DEVICE_INFO		= 0xA,
+	BT_SEQ_GET_BT_FORB_SLOT_VAL		= 0xB,
+};
+
 struct btc_coexist {
 	/* make sure only one adapter can bind the data context  */
 	bool binded;
@@ -573,6 +621,8 @@ struct btc_coexist {
 	bool manual_control;
 	struct btc_statistics statistics;
 	u8 pwr_mode_val[10];
+
+	struct completion bt_mp_comp;
 
 	/* function pointers - io related */
 	bfp_btc_r1 btc_read_1byte;
@@ -598,6 +648,12 @@ struct btc_coexist {
 	bfp_btc_set btc_set;
 
 	bfp_btc_set_bt_reg btc_set_bt_reg;
+
+	bfp_btc_get_bt_coex_supported_feature btc_get_bt_coex_supported_feature;
+	bfp_btc_get_bt_coex_supported_version btc_get_bt_coex_supported_version;
+	bfp_btc_get_ant_det_val_from_bt btc_get_ant_det_val_from_bt;
+	bfp_btc_get_ble_scan_type_from_bt btc_get_ble_scan_type_from_bt;
+	bfp_btc_get_ble_scan_para_from_bt btc_get_ble_scan_para_from_bt;
 };
 
 bool halbtc_is_wifi_uplink(struct rtl_priv *adapter);
