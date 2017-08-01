@@ -29,7 +29,7 @@
  *		Debug related function
  ***************************************************/
 
-const char *const gl_btc_wifi_bw_string[] = {
+static const char *const gl_btc_wifi_bw_string[] = {
 	"11bg",
 	"HT20",
 	"HT40",
@@ -37,7 +37,7 @@ const char *const gl_btc_wifi_bw_string[] = {
 	"HT160"
 };
 
-const char *const gl_btc_wifi_freq_string[] = {
+static const char *const gl_btc_wifi_freq_string[] = {
 	"2.4G",
 	"5G"
 };
@@ -157,7 +157,7 @@ static u8 halbtc_get_wifi_central_chnl(struct btc_coexist *btcoexist)
 	return chnl;
 }
 
-u8 rtl_get_hwpg_single_ant_path(struct rtl_priv *rtlpriv)
+static u8 rtl_get_hwpg_single_ant_path(struct rtl_priv *rtlpriv)
 {
 	struct rtl_mod_params *mod_params = rtlpriv->cfg->mod_params;
 
@@ -172,12 +172,12 @@ u8 rtl_get_hwpg_single_ant_path(struct rtl_priv *rtlpriv)
 	return rtlpriv->btcoexist.btc_info.single_ant_path;
 }
 
-u8 rtl_get_hwpg_bt_type(struct rtl_priv *rtlpriv)
+static u8 rtl_get_hwpg_bt_type(struct rtl_priv *rtlpriv)
 {
 	return rtlpriv->btcoexist.btc_info.bt_type;
 }
 
-u8 rtl_get_hwpg_ant_num(struct rtl_priv *rtlpriv)
+static u8 rtl_get_hwpg_ant_num(struct rtl_priv *rtlpriv)
 {
 	struct rtl_mod_params *mod_params = rtlpriv->cfg->mod_params;
 	u8 num;
@@ -194,7 +194,7 @@ u8 rtl_get_hwpg_ant_num(struct rtl_priv *rtlpriv)
 	return num;
 }
 
-u8 rtl_get_hwpg_package_type(struct rtl_priv *rtlpriv)
+static u8 rtl_get_hwpg_package_type(struct rtl_priv *rtlpriv)
 {
 	struct rtl_hal *rtlhal = rtl_hal(rtlpriv);
 
@@ -510,7 +510,7 @@ static u32 halbtc_get_bt_forbidden_slot_val(void *btc_context)
 	return btcoexist->bt_info.bt_forb_slot_val;
 }
 
-u32 halbtc_get_wifi_link_status(struct btc_coexist *btcoexist)
+static u32 halbtc_get_wifi_link_status(struct btc_coexist *btcoexist)
 {
 	/* return value:
 	 * [31:16] => connected port number
@@ -1002,7 +1002,8 @@ static void halbtc_write_4byte(void *bt_context, u32 reg_addr, u32 data)
 	rtl_write_dword(rtlpriv, reg_addr, data);
 }
 
-void halbtc_write_local_reg_1byte(void *btc_context, u32 reg_addr, u8 data)
+static void halbtc_write_local_reg_1byte(void *btc_context, u32 reg_addr,
+					 u8 data)
 {
 	struct btc_coexist *btcoexist = (struct btc_coexist *)btc_context;
 	struct rtl_priv *rtlpriv = btcoexist->adapter;
@@ -1013,22 +1014,6 @@ void halbtc_write_local_reg_1byte(void *btc_context, u32 reg_addr, u8 data)
 		rtl_write_byte(rtlpriv, reg_addr, data);
 	else if (btcoexist->chip_interface == BTC_INTF_USB)
 		rtl_write_byte(rtlpriv, reg_addr, data);
-}
-
-void halbtc_set_macreg(void *btc_context, u32 reg_addr, u32 bit_mask, u32 data)
-{
-	struct btc_coexist *btcoexist = (struct btc_coexist *)btc_context;
-	struct rtl_priv *rtlpriv = btcoexist->adapter;
-
-	rtl_set_bbreg(rtlpriv->mac80211.hw, reg_addr, bit_mask, data);
-}
-
-u32 halbtc_get_macreg(void *btc_context, u32 reg_addr, u32 bit_mask)
-{
-	struct btc_coexist *btcoexist = (struct btc_coexist *)btc_context;
-	struct rtl_priv *rtlpriv = btcoexist->adapter;
-
-	return rtl_get_bbreg(rtlpriv->mac80211.hw, reg_addr, bit_mask);
 }
 
 static void halbtc_set_bbreg(void *bt_context, u32 reg_addr, u32 bit_mask,
@@ -1098,6 +1083,7 @@ static void halbtc_set_default_port_id_cmd(void *bt_context)
 	rtlpriv->cfg->ops->set_default_port_id_cmd(hw);
 }
 
+static
 void halbtc_set_bt_reg(void *btc_context, u8 reg_type, u32 offset, u32 set_val)
 {
 	struct btc_coexist *btcoexist = (struct btc_coexist *)btc_context;
@@ -1142,7 +1128,7 @@ static u32 halbtc_get_bt_reg(void *btc_context, u8 reg_type, u32 offset)
 	return 0;
 }
 
-bool halbtc_under_ips(struct btc_coexist *btcoexist)
+static bool halbtc_under_ips(struct btc_coexist *btcoexist)
 {
 	struct rtl_priv *rtlpriv = btcoexist->adapter;
 	struct rtl_ps_ctl *ppsc = rtl_psc(rtlpriv);
