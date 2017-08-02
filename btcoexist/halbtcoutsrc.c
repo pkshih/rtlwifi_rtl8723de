@@ -25,6 +25,8 @@
 
 #include "halbt_precomp.h"
 
+/* for uncooked code */
+struct seq_file *global_m;
 u8 gl_btc_trace_buf[BT_TMP_BUF_SIZE];
 
 /***************************************************
@@ -2210,6 +2212,9 @@ void exhalbtc_set_single_ant_path(struct btc_coexist *btcoexist,
 void exhalbtc_display_bt_coex_info(struct btc_coexist *btcoexist,
 				   struct seq_file *m)
 {
+	/* for uncooked code */
+	global_m = m;
+
 	if (!halbtc_is_bt_coexist_available(btcoexist))
 		return;
 

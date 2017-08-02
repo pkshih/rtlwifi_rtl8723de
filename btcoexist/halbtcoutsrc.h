@@ -756,6 +756,8 @@ enum btc_mp_h2c_req_num {
 };
 
 struct btc_coexist {
+	/* for uncooked code */
+	u8 cli_buf[240];
 	/* make sure only one adapter can bind the data context  */
 	bool binded;
 	/* default adapter */

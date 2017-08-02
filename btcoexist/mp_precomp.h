@@ -1,3 +1,4 @@
+/* only uncooked code include this file */
 
 #include "halbt_precomp.h"
 
@@ -22,3 +23,17 @@
 
 #define TRUE	true
 #define FALSE	false
+
+#define CL_SPRINTF(cli_buf, BT_TMP_BUF_SIZE, ...)	seq_printf(global_m, ##__VA_ARGS__)
+#define CL_PRINTF(...)
+
+extern struct seq_file *global_m;
+
+#define BTC_SPRINTF	snprintf
+
+#define BTC_TRACE(x)		{		\
+					struct rtl_priv *rtlpriv = btcoexist->adapter;	\
+					RT_TRACE(rtlpriv, COMP_BT_COEXIST, DBG_LOUD, x);\
+				}
+
+#define btc_disp_dbg_msg(x, y)	btc_disp_dbg_msg(x, y, global_m)
