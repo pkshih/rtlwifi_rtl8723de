@@ -25,6 +25,8 @@
 
 #include "halbt_precomp.h"
 
+u8 gl_btc_trace_buf[BT_TMP_BUF_SIZE];
+
 /***************************************************
  *		Debug related function
  ***************************************************/

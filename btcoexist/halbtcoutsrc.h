@@ -29,6 +29,9 @@
 
 #define		BTC_COEX_OFFLOAD			0
 
+/* for uncooked code */
+extern u8 gl_btc_trace_buf[];
+
 #define		NORMAL_EXEC				false
 #define		FORCE_EXEC				true
 
