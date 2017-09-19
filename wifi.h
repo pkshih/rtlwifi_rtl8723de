@@ -1614,6 +1614,7 @@ struct rtl_hal {
 
 	bool real_wow_v2_enable;
 	bool re_init_llt_table;
+	bool iqk_fw_offload;
 };
 
 struct rtl_security {
