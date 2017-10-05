@@ -1364,6 +1364,7 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 			struct rtl_sta_info *sta_entry;
 			sta_entry = (struct rtl_sta_info *)sta->drv_priv;
 			sta_entry->wireless_mode = mac->mode;
+			rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0, true);
 		}
 
 		if (sta->ht_cap.ht_supported) {
