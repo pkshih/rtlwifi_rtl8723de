@@ -2019,13 +2019,20 @@ static bool _rtl_pci_find_adapter(struct pci_dev *pdev,
 
 	switch (rtlhal->hw_type) {
 	case HARDWARE_TYPE_RTL8192EE:
+		/* use new trx flow */
+		rtlpriv->use_new_trx_flow = true;
+		rtlpriv->use_new_phydm = false;
+		break;
 	case HARDWARE_TYPE_RTL8822BE:
 		/* use new trx flow */
 		rtlpriv->use_new_trx_flow = true;
+		/* use new phydm */
+		rtlpriv->use_new_phydm = true;
 		break;
 
 	default:
 		rtlpriv->use_new_trx_flow = false;
+		rtlpriv->use_new_phydm = false;
 		break;
 	}
 

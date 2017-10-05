@@ -710,7 +710,11 @@ static void _rtl_txrate_selectmode(struct ieee80211_hw *hw,
 
 	if (sta) {
 		sta_entry = (struct rtl_sta_info *) sta->drv_priv;
-		ratr_index = sta_entry->ratr_index;
+
+		if (rtlpriv->use_new_phydm)
+			ratr_index = sta_entry->cmn_info.ra_info.rate_id;
+		else
+			ratr_index = sta_entry->ratr_index;
 	}
 	if (!tcb_desc->disable_ratefallback || !tcb_desc->use_driver_rate) {
 		if (mac->opmode == NL80211_IFTYPE_STATION) {
