@@ -5,6 +5,7 @@ ccflags-y += -DDM_ODM_SUPPORT_TYPE=0x04
 ccflags-y += -DDBG=1
 ccflags-y += -DMP_DRIVER=0
 ccflags-y += -DDISABLE_BB_RF=0
+ccflags-y += -DCONFIG_LONG_DELAY_ISSUE=1
 # support list
 ccflags-y += -DRTL8881A_SUPPORT=0
 ccflags-y += -DRTL8188E_SUPPORT=0
