@@ -119,6 +119,19 @@ config RTL8822BE
 
 	If you choose to build it as a module, it will be called rtl8821ae
 
+config RTL8723DE
+	tristate "Realtek RTL8822BE Wireless Network Adapter"
+	depends on PCI
+	select RTLWIFI
+	select RTLWIFI_PCI
+	select RTLBTCOEXIST
+	select RTLPHYDM
+	---help---
+	This is the driver for Realtek RTL8723DE 802.11ac PCIe
+	wireless network adapters.
+
+	If you choose to build it as a module, it will be called rtl8723de
+
 config RTL8192CU
 	tristate "Realtek RTL8192CU/RTL8188CU USB Wireless Network Adapter"
 	depends on USB
