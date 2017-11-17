@@ -136,6 +136,12 @@ void rtl8723be_firmware_selfreset(struct ieee80211_hw *hw)
 }
 EXPORT_SYMBOL_GPL(rtl8723be_firmware_selfreset);
 
+void rtl8723de_firmware_selfreset(struct ieee80211_hw *hw)
+{
+	rtl8723be_firmware_selfreset(hw);
+}
+EXPORT_SYMBOL_GPL(rtl8723de_firmware_selfreset);
+
 int rtl8723_fw_free_to_go(struct ieee80211_hw *hw, bool is_8723be,
 			  int max_count)
 {

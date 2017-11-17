@@ -31,6 +31,7 @@
 #define FW_8192C_PAGE_SIZE			4096
 #define FW_8723A_POLLING_TIMEOUT_COUNT		1000
 #define FW_8723B_POLLING_TIMEOUT_COUNT		6000
+#define FW_8723D_POLLING_TIMEOUT_COUNT		6000
 #define FW_8192C_POLLING_DELAY			5
 
 #define MCUFWDL_RDY				BIT(1)
@@ -82,6 +83,7 @@ enum rtl8723be_cmd {
 
 void rtl8723ae_firmware_selfreset(struct ieee80211_hw *hw);
 void rtl8723be_firmware_selfreset(struct ieee80211_hw *hw);
+void rtl8723de_firmware_selfreset(struct ieee80211_hw *hw);
 void rtl8723_enable_fw_download(struct ieee80211_hw *hw, bool enable);
 void rtl8723_write_fw(struct ieee80211_hw *hw,
 		      enum version_8723e version,
