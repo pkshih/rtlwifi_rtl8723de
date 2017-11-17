@@ -133,6 +133,7 @@
 #define AVG_THERMAL_NUM			8
 #define AVG_THERMAL_NUM_88E		4
 #define AVG_THERMAL_NUM_8723BE		4
+#define AVG_THERMAL_NUM_8723DE		4
 #define MAX_TID_COUNT			9
 
 /* for early mode */
@@ -3005,6 +3006,7 @@ enum bt_co_type {
 	BT_RTL8192E = 9,
 	BT_RTL8812A = 11,
 	BT_RTL8822B = 12,
+	BT_RTL8723D = 13,
 };
 
 enum bt_total_ant_num {
