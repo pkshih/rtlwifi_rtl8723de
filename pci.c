@@ -1067,7 +1067,8 @@ static irqreturn_t _rtl_pci_interrupt(int irq, void *dev_id)
 	 * are not initialized
 	 */
 	if (rtlhal->hw_type == HARDWARE_TYPE_RTL8188EE ||
-	    rtlhal->hw_type == HARDWARE_TYPE_RTL8723BE) {
+	    rtlhal->hw_type == HARDWARE_TYPE_RTL8723BE ||
+	    rtlhal->hw_type == HARDWARE_TYPE_RTL8723DE) {
 		if (unlikely(intvec.inta &
 		    rtlpriv->cfg->maps[RTL_IMR_HSISR_IND])) {
 			RT_TRACE(rtlpriv, COMP_INTR, DBG_TRACE,
@@ -1999,6 +2000,10 @@ static bool _rtl_pci_find_adapter(struct pci_dev *pdev,
 		rtlhal->bandset = BAND_ON_BOTH;
 		RT_TRACE(rtlpriv, COMP_INIT, DBG_LOUD,
 			 "Find adapter, Hardware type is 8822BE\n");
+	} else if (deviceid == RTL_PCI_8723DE_DID) {
+		rtlhal->hw_type = HARDWARE_TYPE_RTL8723DE;
+		RT_TRACE(rtlpriv, COMP_INIT, DBG_LOUD,
+			 "Find adapter, Hardware type is 8723DE\n");
 	} else {
 		RT_TRACE(rtlpriv, COMP_ERR, DBG_WARNING,
 			 "Err: Unknown device - vid/did=%x/%x\n",
@@ -2033,6 +2038,7 @@ static bool _rtl_pci_find_adapter(struct pci_dev *pdev,
 		rtlpriv->use_new_phydm = false;
 		break;
 	case HARDWARE_TYPE_RTL8822BE:
+	case HARDWARE_TYPE_RTL8723DE:
 		/* use new trx flow */
 		rtlpriv->use_new_trx_flow = true;
 		/* use new phydm */

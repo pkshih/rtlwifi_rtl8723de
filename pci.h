@@ -111,6 +111,7 @@
 #define RTL_PCI_8821AE_DID	0x8821	/*8821ae*/
 #define RTL_PCI_8812AE_DID	0x8812	/*8812ae*/
 #define RTL_PCI_8822BE_DID	0xB822	/*8822be*/
+#define RTL_PCI_8723DE_DID	0xD723	/*8723de*/
 
 /*8192 support 16 pages of IO registers*/
 #define RTL_MEM_MAPPED_IO_RANGE_8190PCI		0x1000
