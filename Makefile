@@ -2,9 +2,9 @@
 SHELL := /bin/sh
 CC = gcc
 KVER  := $(shell uname -r)
-KVER  :=
+#KVER  :=
 KSRC := /lib/modules/$(KVER)/build
-KSRC := /work/linux-src/linux-stable
+#KSRC := /work/linux-src/linux-stable
 FIRMWAREDIR := /lib/firmware/
 PWD := $(shell pwd)
 CLR_MODULE_FILES := *.mod.c *.mod *.o .*.cmd *.ko *~ .tmp_versions* modules.order Module.symvers
