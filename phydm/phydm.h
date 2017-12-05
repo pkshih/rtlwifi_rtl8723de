@@ -1146,7 +1146,6 @@ void *phydm_get_structure(struct PHY_DM_STRUCT *p_dm, u8 structure_type);
 #define IS_HARDWARE_TYPE_8188E(_adapter) false
 #define IS_HARDWARE_TYPE_8188F(_adapter) false
 #define IS_HARDWARE_TYPE_8703B(_adapter) false
-#define IS_HARDWARE_TYPE_8723D(_adapter) false
 #define IS_HARDWARE_TYPE_8821C(_adapter) false
 #define IS_HARDWARE_TYPE_8812AU(_adapter) false
 #define IS_HARDWARE_TYPE_8814A(_adapter) false
