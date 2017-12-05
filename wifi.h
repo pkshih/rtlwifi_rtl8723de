@@ -58,6 +58,11 @@
 #define ether_addr_equal(a, b)  (compare_ether_addr(a, b) == 0)
 #endif
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
+#define ether_addr_copy(to, from) memcpy(to, from, ETH_ALEN)
+#define ether_addr_equal_unaligned(a1, a2) (compare_ether_addr(a1, a2) == 0)
+#endif
+
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 13, 0))
 static inline void *skb_put_data(struct sk_buff *skb, const void *data,
 				 unsigned int len)

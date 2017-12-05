@@ -786,6 +786,10 @@ static bool rtl_phydm_query_phy_status(struct rtl_priv *rtlpriv, u8 *phystrpt,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 5, 0))
 #define ether_addr_equal(a, b)	(compare_ether_addr(a, b) == 0)
 #endif
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
+#define ether_addr_copy(to, from) memcpy(to, from, ETH_ALEN)
+#define ether_addr_equal_unaligned(a1, a2) (compare_ether_addr(a1, a2) == 0)
+#endif
 	struct phy_dm_struct *dm = rtlpriv_to_phydm(rtlpriv);
 	struct rtl_efuse *rtlefuse = rtl_efuse(rtlpriv);
 	struct rtl_mac *mac = rtl_mac(rtlpriv);
