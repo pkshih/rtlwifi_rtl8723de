@@ -359,6 +359,8 @@ static int rtl_phydm_init_priv(struct rtl_priv *rtlpriv,
 
 	if (IS_HARDWARE_TYPE_8822B(rtlpriv))
 		ic = ODM_RTL8822B;
+	else if (IS_HARDWARE_TYPE_8723D(rtlpriv))
+		ic = ODM_RTL8723D;
 	else
 		return 0;
 
