@@ -651,6 +651,15 @@ static bool rtl_phydm_switch_bandwidth(struct rtl_priv *rtlpriv,
 	return false;
 }
 
+static bool rtl_phydm_lq_calibrate(struct rtl_priv *rtlpriv)
+{
+	struct phy_dm_struct *dm = rtlpriv_to_phydm(rtlpriv);
+
+	halrf_lck_trigger(dm);
+
+	return true;
+}
+
 static bool rtl_phydm_iq_calibrate(struct rtl_priv *rtlpriv)
 {
 	struct phy_dm_struct *dm = rtlpriv_to_phydm(rtlpriv);
@@ -1031,6 +1040,7 @@ static struct rtl_phydm_ops rtl_phydm_operation = {
 	.phydm_switch_band = rtl_phydm_switch_band,
 	.phydm_switch_channel = rtl_phydm_switch_channel,
 	.phydm_switch_bandwidth = rtl_phydm_switch_bandwidth,
+	.phydm_lc_calibrate = rtl_phydm_lq_calibrate,
 	.phydm_iq_calibrate = rtl_phydm_iq_calibrate,
 	.phydm_clear_txpowertracking_state =
 		rtl_phydm_clear_txpowertracking_state,

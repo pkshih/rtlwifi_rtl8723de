@@ -2782,6 +2782,7 @@ struct rtl_phydm_ops {
 	bool (*phydm_switch_channel)(struct rtl_priv *rtlpriv, u8 central_ch);
 	bool (*phydm_switch_bandwidth)(struct rtl_priv *rtlpriv, u8 primary_ch_idx,
 				       enum ht_channel_width width);
+	bool (*phydm_lc_calibrate)(struct rtl_priv *rtlpriv);
 	bool (*phydm_iq_calibrate)(struct rtl_priv *rtlpriv);
 	bool (*phydm_clear_txpowertracking_state)(struct rtl_priv *rtlpriv);
 	bool (*phydm_pause_dig)(struct rtl_priv *rtlpriv, bool pause);
