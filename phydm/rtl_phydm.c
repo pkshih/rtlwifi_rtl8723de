@@ -679,8 +679,9 @@ static bool rtl_phydm_iq_calibrate(struct rtl_priv *rtlpriv)
 				   rfk_forbidden);
 		halrf_cmn_info_set(dm, HALRF_CMNINFO_IQK_SEGMENT, segment);
 		halrf_segment_iqk_trigger(dm, clear, segment);
-	} else
-		return false;
+	} else {
+		halrf_iqk_trigger(dm, false);
+	}
 
 	return true;
 }
