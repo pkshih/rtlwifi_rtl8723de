@@ -1944,7 +1944,8 @@ static int rtl_debug_get_rsvd(struct seq_file *m, void *v)
 		data_low = rtl_read_dword(rtlpriv, REG_PKTBUF_DBG_DATA_L);
 		data_high = rtl_read_dword(rtlpriv, REG_PKTBUF_DBG_DATA_H);
 
-		seq_printf(m, "0x%04X: ", i * 8);
+		if ((i & 0x1) == 0)
+			seq_printf(m, "0x%04X: ", i * 8);
 
 		data_raw = (u8 *)&data_low;
 		for (j = 0; j < 4; j++)
@@ -1954,7 +1955,8 @@ static int rtl_debug_get_rsvd(struct seq_file *m, void *v)
 		for (j = 0; j < 4; j++)
 			seq_printf(m, "%02X ", *(data_raw + j));
 
-		seq_puts(m, "\n");
+		if (i & 0x1)
+			seq_puts(m, "\n");
 	}
 	rtl_write_byte(rtlpriv, REG_PKT_BUFF_ACCESS_CTRL, 0x0);
 
