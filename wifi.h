@@ -84,6 +84,35 @@ static inline void *skb_put_zero(struct sk_buff *skb, unsigned int len)
 }
 #endif
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0))
+#define timer_setup(timer, callback, flags)			\
+	__setup_timer((timer), (void (*)(unsigned long))(callback),	\
+	(unsigned long)(timer), (flags))
+#define from_timer(var, callback_timer, timer_fieldname) \
+	container_of(callback_timer, typeof(*var), timer_fieldname)
+#endif
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
+typedef __s32 time64_t;
+
+static inline time64_t ktime_get_real_seconds(void)
+{
+	struct timeval ts;
+
+	do_gettimeofday(&ts);
+	return ts.tv_sec;
+}
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3, 18, 0))
+static inline time64_t ktime_get_real_seconds(void)
+{
+	struct timespec64 tv;
+
+	getnstimeofday64(&tv);
+
+	return tv.tv_sec;
+}
+#endif
+
 #define	MASKBYTE0				0xff
 #define	MASKBYTE1				0xff00
 #define	MASKBYTE2				0xff0000
