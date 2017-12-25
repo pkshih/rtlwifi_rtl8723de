@@ -26,6 +26,7 @@
  *****************************************************************************/
 
 #include <linux/kernel.h>
+#include <linux/bug.h>	/* for ARRAY_SIZE() if kernel < 4.12 */
 #include "table.h"
 
 u32 RTL8723BEPHY_REG_1TARRAY[] = {

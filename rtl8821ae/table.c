@@ -25,6 +25,7 @@
  *
  *****************************************************************************/
 #include <linux/kernel.h>
+#include <linux/bug.h>	/* for ARRAY_SIZE() if kernel < 4.12 */
 #include "table.h"
 u32 RTL8812AE_PHY_REG_ARRAY[] = {
 		0x800, 0x8020D010,
