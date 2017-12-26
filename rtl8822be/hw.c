@@ -2120,6 +2120,7 @@ static u32 _rtl8822be_rate_to_bitmap_2ssvht(__le16 vht_rate)
 	return rate_bitmap;
 }
 
+#ifdef USE_ORIGINAL_RA
 static u8 _rtl8822be_get_vht_en(enum wireless_mode wirelessmode,
 				u32 ratr_bitmap)
 {
@@ -2138,6 +2139,22 @@ static u8 _rtl8822be_get_vht_en(enum wireless_mode wirelessmode,
 
 	return ret << 4;
 }
+#endif
+
+#ifdef USE_ORIGINAL_RA
+static u8 _rtl8822be_get_ra_ldpc(struct ieee80211_hw *hw, u8 mac_id,
+				 struct rtl_sta_info *sta_entry,
+				 enum wireless_mode wirelessmode)
+{
+	u8 b_ldpc = 0;
+
+	/*ldpc in cmn sta info*/
+	if (sta_entry->cmn_info.ldpc_en)
+		b_ldpc = 1;
+
+	return b_ldpc << 2;
+}
+#endif
 
 static u8 _rtl8822be_get_ra_rftype(struct ieee80211_hw *hw,
 				   enum wireless_mode wirelessmode,
@@ -2190,18 +2207,24 @@ static void rtl8822be_update_hal_rate_mask(struct ieee80211_hw *hw,
 					   u8 rssi_level, u8 is_update_bw)
 {
 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+#ifdef USE_ORIGINAL_RA
 	struct rtl_phy *rtlphy = &rtlpriv->phy;
+#endif
 	struct rtl_mac *mac = rtl_mac(rtl_priv(hw));
 	struct rtl_sta_info *sta_entry = NULL;
 	u32 ratr_bitmap, ratr_bitmap_msb = 0;
+#ifdef USE_ORIGINAL_RA
 	u8 ratr_index;
+#endif
 	enum wireless_mode wirelessmode = 0;
 	u8 curtxbw_40mhz =
 		(sta->ht_cap.cap & IEEE80211_HT_CAP_SUP_WIDTH_20_40) ? 1 : 0;
 	bool b_vht_support =
 		(sta->vht_cap.vht_supported) ? 1 : 0;
 	bool b_shortgi = false;
+#ifdef USE_ORIGINAL_RA
 	u8 rate_mask[7];
+#endif
 	u8 macid = 0;
 	u8 rf_type;
 	u8 w_set = 0;
@@ -2276,10 +2299,53 @@ static void rtl8822be_update_hal_rate_mask(struct ieee80211_hw *hw,
 	sta_entry->cmn_info.mimo_type = rf_type;
 	sta_entry->cmn_info.ra_info.is_vht_enable = b_vht_support;
 
+#ifdef USE_ORIGINAL_RA
+	ratr_index = rtlpriv->phydm.ops->phydm_rate_id_mapping(
+		rtlpriv, wirelessmode, rf_type, rtlphy->current_chan_bw);
+	sta_entry->cmn_info.ra_info.rate_id = ratr_index; /* phydm v21 will update rate_id */
+#endif
+
 	RT_TRACE(rtlpriv, COMP_RATR, DBG_DMESG, "vht=%d, sgi=%d, w_set=0x%x\n",
 		sta_entry->cmn_info.ra_info.is_vht_enable,
 		sta_entry->cmn_info.ra_info.is_support_sgi,
 		sta_entry->cmn_info.support_wireless_set);
+
+#ifdef USE_ORIGINAL_RA
+	rtlpriv->phydm.ops->phydm_get_ra_bitmap(
+		rtlpriv, wirelessmode, rf_type, rtlphy->current_chan_bw,
+		rssi_level, &ratr_bitmap_msb, &ratr_bitmap);
+
+	RT_TRACE(rtlpriv, COMP_RATR, DBG_LOUD, "ratr_bitmap :%x\n",
+		 ratr_bitmap);
+
+	rate_mask[0] = macid;
+	rate_mask[1] = ratr_index | (b_shortgi ? 0x80 : 0x00);
+	rate_mask[2] =
+		rtlphy->current_chan_bw |((!is_update_bw)<<3) |
+		_rtl8822be_get_vht_en(wirelessmode, ratr_bitmap) |
+		_rtl8822be_get_ra_ldpc(hw, macid, sta_entry, wirelessmode);
+
+	rate_mask[3] = (u8)(ratr_bitmap & 0x000000ff);
+	rate_mask[4] = (u8)((ratr_bitmap & 0x0000ff00) >> 8);
+	rate_mask[5] = (u8)((ratr_bitmap & 0x00ff0000) >> 16);
+	rate_mask[6] = (u8)((ratr_bitmap & 0xff000000) >> 24);
+
+	RT_TRACE(
+		rtlpriv, COMP_RATR, DBG_DMESG,
+		"Rate_index:%x, ratr_msb:%08x, ratr_lsb:%08x, %02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+		ratr_index, ratr_bitmap_msb, ratr_bitmap, rate_mask[0], rate_mask[1],
+		rate_mask[2], rate_mask[3], rate_mask[4], rate_mask[5],
+		rate_mask[6]);
+	rtl8822be_fill_h2c_cmd(hw, H2C_8822B_MACID_CFG, 7, rate_mask);
+
+	/* for h2c cmd 0x46, only modify cmd id & ra mask */
+	/* Keep rate_mask0~2 of cmd 0x40, but clear byte3 and later */
+	/* 8822B has no 3SS, so keep it zeros. */
+	memset(rate_mask + 3, 0, 4);
+
+	rtl8822be_fill_h2c_cmd(hw, H2C_8822B_MACID_CFG_3SS, 7, rate_mask);
+
+#endif
 
 	_rtl8822be_set_bcn_ctrl_reg(hw, BIT(3), 0);
 }
