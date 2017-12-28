@@ -1434,17 +1434,25 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 		struct rtl_phy *rtlphy = &rtlpriv->phy;
 		struct ieee80211_sta *sta = NULL;
 		struct rtl_sta_info *sta_entry = NULL;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
 		enum nl80211_chan_width width = bss_conf->chandef.width;
+#endif
+
 		enum nl80211_channel_type channel_type = NL80211_CHAN_NO_HT;
 
 		RT_TRACE(rtlpriv, COMP_MAC80211, DBG_TRACE,
 			 "BSS_CHANGED_BANDWIDTH\n");
 
 		/* channel_type is for 20&40M */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
 		if (width < NL80211_CHAN_WIDTH_80)
 			channel_type =
 				cfg80211_get_chandef_type(&hw->conf.chandef);
+#else
+		channel_type = hw->conf.channel_type;
+#endif
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
 		if (width >= NL80211_CHAN_WIDTH_80) {
 			if (width == NL80211_CHAN_WIDTH_80) {
 				u32 center = hw->conf.chandef.center_freq1;
@@ -1477,6 +1485,9 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 				}
 			}
 		} else {
+#else
+		{
+#endif
 			switch (channel_type) {
 			case NL80211_CHAN_HT20:
 			case NL80211_CHAN_NO_HT:
