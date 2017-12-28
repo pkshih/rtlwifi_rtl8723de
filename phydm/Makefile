@@ -2,6 +2,7 @@ ccflags-y += -I$(src)/
 
 ccflags-y += -DDM_ODM_CE_MAC80211
 ccflags-y += -DDM_ODM_SUPPORT_TYPE=0x04
+ccflags-y += -DODM_WIN=0x08
 ccflags-y += -DDBG=1
 ccflags-y += -DMP_DRIVER=0
 ccflags-y += -DDISABLE_BB_RF=0
