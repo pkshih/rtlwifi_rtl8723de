@@ -562,18 +562,6 @@ enum prime_sc {
 	PRIME_CHNL_OFFSET_UPPER = 2,
 };
 
-enum rf_type {
-	RF_1T1R = 0,
-	RF_1T2R = 1,
-	RF_2T2R = 2,
-	RF_2T2R_GREEN = 3,
-	RF_2T3R = 4,
-	RF_2T4R = 5,
-	RF_3T3R = 6,
-	RF_3T4R = 7,
-	RF_4T4R = 8,
-};
-
 enum ht_channel_width {
 	HT_CHANNEL_WIDTH_20 = 0,
 	HT_CHANNEL_WIDTH_20_40 = 1,
