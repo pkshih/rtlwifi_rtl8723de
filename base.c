@@ -183,6 +183,9 @@ static void _rtl_init_hw_ht_capab(struct ieee80211_hw *hw,
 	    IEEE80211_HT_CAP_SGI_20 |
 	    IEEE80211_HT_CAP_DSSSCCK40 | IEEE80211_HT_CAP_MAX_AMSDU;
 
+	if (rtlpriv->cfg->ht_cap_info)
+		ht_cap->cap = rtlpriv->cfg->ht_cap_info;
+
 	if (rtlpriv->rtlhal.disable_amsdu_8k)
 		ht_cap->cap &= ~IEEE80211_HT_CAP_MAX_AMSDU;
 
@@ -310,6 +313,9 @@ static void _rtl_init_hw_vht_capab(struct ieee80211_hw *hw,
 		vht_cap->vht_mcs.tx_highest =
 			cpu_to_le16(MAX_BIT_RATE_SHORT_GI_1NSS_80MHZ_MCS9);
 	}
+
+	if (rtlpriv->cfg->vht_cap_info)
+		vht_cap->cap = rtlpriv->cfg->vht_cap_info;
 }
 
 static void _rtl_init_mac80211(struct ieee80211_hw *hw)
