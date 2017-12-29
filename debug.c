@@ -1914,6 +1914,60 @@ static struct rtl_debugfs_priv rtl_debug_priv_dump_sta_info = {
 	.cb_data = 0,
 };
 
+static int rtl_debug_get_rsvd(struct seq_file *m, void *v)
+{
+	struct rtl_debugfs_priv *debugfs_priv = m->private;
+	struct rtl_priv *rtlpriv = debugfs_priv->rtlpriv;
+	u32 /*addr = 0, size = 0,*/ count = 0;
+	u32 page_size = 128, data_low = 0, data_high = 0;
+	u16 txbndy = 0, offset = 0;
+	u8 i = 0, j;
+	u8 *data_raw;
+	u32 page_offset = 0;
+	u32 buffer_size = 1280;
+
+#define REG_TDECTRL						0x0208
+#define REG_PKT_BUFF_ACCESS_CTRL		0x0106
+#define REG_PKTBUF_DBG_CTRL			0x0140
+#define REG_PKTBUF_DBG_DATA_L			0x0144
+#define REG_PKTBUF_DBG_DATA_H		0x0148
+
+	txbndy = rtl_read_byte(rtlpriv, REG_TDECTRL + 1);
+
+	offset = (txbndy + page_offset) * page_size / 8;
+	count = (buffer_size / 8);
+
+	rtl_write_byte(rtlpriv, REG_PKT_BUFF_ACCESS_CTRL, 0x69);
+
+	for (i = 0 ; i < count ; i++) {
+		rtl_write_dword(rtlpriv, REG_PKTBUF_DBG_CTRL, offset + i);
+		data_low = rtl_read_dword(rtlpriv, REG_PKTBUF_DBG_DATA_L);
+		data_high = rtl_read_dword(rtlpriv, REG_PKTBUF_DBG_DATA_H);
+
+		seq_printf(m, "0x%04X: ", i * 8);
+
+		data_raw = (u8 *)&data_low;
+		for (j = 0; j < 4; j++)
+			seq_printf(m, "%02X ", *(data_raw + j));
+
+		data_raw = (u8 *)&data_high;
+		for (j = 0; j < 4; j++)
+			seq_printf(m, "%02X ", *(data_raw + j));
+
+		seq_puts(m, "\n");
+	}
+	rtl_write_byte(rtlpriv, REG_PKT_BUFF_ACCESS_CTRL, 0x0);
+
+	seq_puts(m, "\n");
+
+	return 0;
+}
+
+static struct rtl_debugfs_priv rtl_debug_priv_rsvd = {
+	.cb_read = rtl_debug_get_rsvd,
+	.cb_data = 0,
+};
+
 static ssize_t rtl_debugfs_set_write_reg(struct file *filp,
 					 const char __user *buffer,
 					 size_t count, loff_t *loff)
@@ -2258,6 +2312,7 @@ void rtl_debug_add_one(struct ieee80211_hw *hw)
 	RTL_DEBUGFS_ADD(txpwr);
 	RTL_DEBUGFS_ADD(btcoex);
 	RTL_DEBUGFS_ADD(dump_sta_info);
+	RTL_DEBUGFS_ADD(rsvd);
 
 	RTL_DEBUGFS_ADD_W(write_reg);
 	RTL_DEBUGFS_ADD_W(write_h2c);
