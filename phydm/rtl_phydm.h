@@ -25,6 +25,14 @@
 #ifndef __RTL_PHYDM_H__
 #define __RTL_PHYDM_H__
 
+/* for uncooked phydm */
+#ifdef PHYDM_TESTCHIP_SUPPORT	/* borrow to check uncooked code */
+#define phy_dm_struct PHY_DM_STRUCT
+#define dm_per_pkt_info phydm_perpkt_info_struct
+#define dm_phy_status_info phydm_phyinfo_struct
+#define odm_ic_type phydm_ic_e
+#endif
+
 enum {
 	UP_LINK,
 	DOWN_LINK,
