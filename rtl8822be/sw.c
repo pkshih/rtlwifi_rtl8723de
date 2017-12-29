@@ -97,6 +97,8 @@ int rtl8822be_init_sw_vars(struct ieee80211_hw *hw)
 	struct rtl_pci *rtlpci = rtl_pcidev(rtl_pcipriv(hw));
 	const char *fw_name;
 	struct rtl_phydm_params params;
+	extern int fix_rate;
+	u8 tmp8 = 0;
 
 	rtl8822be_bt_reg_init(hw);
 	rtlpci->msi_support = rtlpriv->cfg->mod_params->msi_support;
@@ -113,6 +115,15 @@ int rtl8822be_init_sw_vars(struct ieee80211_hw *hw)
 	rtlpriv->phydm.ops = rtl_phydm_get_ops_pointer();
 	rtlpriv->phydm.ops->phydm_init_priv(rtlpriv, &params);
 
+	if (fix_rate >= 0) {
+		tmp8 = rtl_hw_rate_to_m_rate(fix_rate);
+		if (tmp8 == MGN_UNKNOWN)
+			RT_TRACE(rtlpriv, COMP_RATE, DBG_WARNING,
+				 "%s, %d, Wrong fix rate!!\n",
+				 __func__, __LINE__);
+	}
+
+	rtlpriv->phydm.forced_data_rate = tmp8;
 	rtlpriv->phydm.adaptivity_en = 0;
 	rtlpriv->phydm.antenna_test = false;
 

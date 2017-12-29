@@ -1296,6 +1296,272 @@ int rtlwifi_rate_mapping(struct ieee80211_hw *hw, bool isht, bool isvht,
 }
 EXPORT_SYMBOL(rtlwifi_rate_mapping);
 
+u8	rtl_hw_rate_to_m_rate(u8 rate)
+{
+	u8	ret_rate = MGN_1M;
+
+	switch (rate) {
+	case DESC_RATE1M:
+		ret_rate = MGN_1M;
+		break;
+	case DESC_RATE2M:
+		ret_rate = MGN_2M;
+		break;
+	case DESC_RATE5_5M:
+		ret_rate = MGN_5_5M;
+		break;
+	case DESC_RATE11M:
+		ret_rate = MGN_11M;
+		break;
+	case DESC_RATE6M:
+		ret_rate = MGN_6M;
+		break;
+	case DESC_RATE9M:
+		ret_rate = MGN_9M;
+		break;
+	case DESC_RATE12M:
+		ret_rate = MGN_12M;
+		break;
+	case DESC_RATE18M:
+		ret_rate = MGN_18M;
+		break;
+	case DESC_RATE24M:
+		ret_rate = MGN_24M;
+		break;
+	case DESC_RATE36M:
+		ret_rate = MGN_36M;
+		break;
+	case DESC_RATE48M:
+		ret_rate = MGN_48M;
+		break;
+	case DESC_RATE54M:
+		ret_rate = MGN_54M;
+		break;
+	case DESC_RATEMCS0:
+		ret_rate = MGN_MCS0;
+		break;
+	case DESC_RATEMCS1:
+		ret_rate = MGN_MCS1;
+		break;
+	case DESC_RATEMCS2:
+		ret_rate = MGN_MCS2;
+		break;
+	case DESC_RATEMCS3:
+		ret_rate = MGN_MCS3;
+		break;
+	case DESC_RATEMCS4:
+		ret_rate = MGN_MCS4;
+		break;
+	case DESC_RATEMCS5:
+		ret_rate = MGN_MCS5;
+		break;
+	case DESC_RATEMCS6:
+		ret_rate = MGN_MCS6;
+		break;
+	case DESC_RATEMCS7:
+		ret_rate = MGN_MCS7;
+		break;
+	case DESC_RATEMCS8:
+		ret_rate = MGN_MCS8;
+		break;
+	case DESC_RATEMCS9:
+		ret_rate = MGN_MCS9;
+		break;
+	case DESC_RATEMCS10:
+		ret_rate = MGN_MCS10;
+		break;
+	case DESC_RATEMCS11:
+		ret_rate = MGN_MCS11;
+		break;
+	case DESC_RATEMCS12:
+		ret_rate = MGN_MCS12;
+		break;
+	case DESC_RATEMCS13:
+		ret_rate = MGN_MCS13;
+		break;
+	case DESC_RATEMCS14:
+		ret_rate = MGN_MCS14;
+		break;
+	case DESC_RATEMCS15:
+		ret_rate = MGN_MCS15;
+		break;
+	case DESC_RATEMCS16:
+		ret_rate = MGN_MCS16;
+		break;
+	case DESC_RATEMCS17:
+		ret_rate = MGN_MCS17;
+		break;
+	case DESC_RATEMCS18:
+		ret_rate = MGN_MCS18;
+		break;
+	case DESC_RATEMCS19:
+		ret_rate = MGN_MCS19;
+		break;
+	case DESC_RATEMCS20:
+		ret_rate = MGN_MCS20;
+		break;
+	case DESC_RATEMCS21:
+		ret_rate = MGN_MCS21;
+		break;
+	case DESC_RATEMCS22:
+		ret_rate = MGN_MCS22;
+		break;
+	case DESC_RATEMCS23:
+		ret_rate = MGN_MCS23;
+		break;
+	case DESC_RATEMCS24:
+		ret_rate = MGN_MCS24;
+		break;
+	case DESC_RATEMCS25:
+		ret_rate = MGN_MCS25;
+		break;
+	case DESC_RATEMCS26:
+		ret_rate = MGN_MCS26;
+		break;
+	case DESC_RATEMCS27:
+		ret_rate = MGN_MCS27;
+		break;
+	case DESC_RATEMCS28:
+		ret_rate = MGN_MCS28;
+		break;
+	case DESC_RATEMCS29:
+		ret_rate = MGN_MCS29;
+		break;
+	case DESC_RATEMCS30:
+		ret_rate = MGN_MCS30;
+		break;
+	case DESC_RATEMCS31:
+		ret_rate = MGN_MCS31;
+		break;
+	case DESC_RATEVHT1SS_MCS0:
+		ret_rate = MGN_VHT1SS_MCS0;
+		break;
+	case DESC_RATEVHT1SS_MCS1:
+		ret_rate = MGN_VHT1SS_MCS1;
+		break;
+	case DESC_RATEVHT1SS_MCS2:
+		ret_rate = MGN_VHT1SS_MCS2;
+		break;
+	case DESC_RATEVHT1SS_MCS3:
+		ret_rate = MGN_VHT1SS_MCS3;
+		break;
+	case DESC_RATEVHT1SS_MCS4:
+		ret_rate = MGN_VHT1SS_MCS4;
+		break;
+	case DESC_RATEVHT1SS_MCS5:
+		ret_rate = MGN_VHT1SS_MCS5;
+		break;
+	case DESC_RATEVHT1SS_MCS6:
+		ret_rate = MGN_VHT1SS_MCS6;
+		break;
+	case DESC_RATEVHT1SS_MCS7:
+		ret_rate = MGN_VHT1SS_MCS7;
+		break;
+	case DESC_RATEVHT1SS_MCS8:
+		ret_rate = MGN_VHT1SS_MCS8;
+		break;
+	case DESC_RATEVHT1SS_MCS9:
+		ret_rate = MGN_VHT1SS_MCS9;
+		break;
+	case DESC_RATEVHT2SS_MCS0:
+		ret_rate = MGN_VHT2SS_MCS0;
+		break;
+	case DESC_RATEVHT2SS_MCS1:
+		ret_rate = MGN_VHT2SS_MCS1;
+		break;
+	case DESC_RATEVHT2SS_MCS2:
+		ret_rate = MGN_VHT2SS_MCS2;
+		break;
+	case DESC_RATEVHT2SS_MCS3:
+		ret_rate = MGN_VHT2SS_MCS3;
+		break;
+	case DESC_RATEVHT2SS_MCS4:
+		ret_rate = MGN_VHT2SS_MCS4;
+		break;
+	case DESC_RATEVHT2SS_MCS5:
+		ret_rate = MGN_VHT2SS_MCS5;
+		break;
+	case DESC_RATEVHT2SS_MCS6:
+		ret_rate = MGN_VHT2SS_MCS6;
+		break;
+	case DESC_RATEVHT2SS_MCS7:
+		ret_rate = MGN_VHT2SS_MCS7;
+		break;
+	case DESC_RATEVHT2SS_MCS8:
+		ret_rate = MGN_VHT2SS_MCS8;
+		break;
+	case DESC_RATEVHT2SS_MCS9:
+		ret_rate = MGN_VHT2SS_MCS9;
+		break;
+	case DESC_RATEVHT3SS_MCS0:
+		ret_rate = MGN_VHT3SS_MCS0;
+		break;
+	case DESC_RATEVHT3SS_MCS1:
+		ret_rate = MGN_VHT3SS_MCS1;
+		break;
+	case DESC_RATEVHT3SS_MCS2:
+		ret_rate = MGN_VHT3SS_MCS2;
+		break;
+	case DESC_RATEVHT3SS_MCS3:
+		ret_rate = MGN_VHT3SS_MCS3;
+		break;
+	case DESC_RATEVHT3SS_MCS4:
+		ret_rate = MGN_VHT3SS_MCS4;
+		break;
+	case DESC_RATEVHT3SS_MCS5:
+		ret_rate = MGN_VHT3SS_MCS5;
+		break;
+	case DESC_RATEVHT3SS_MCS6:
+		ret_rate = MGN_VHT3SS_MCS6;
+		break;
+	case DESC_RATEVHT3SS_MCS7:
+		ret_rate = MGN_VHT3SS_MCS7;
+		break;
+	case DESC_RATEVHT3SS_MCS8:
+		ret_rate = MGN_VHT3SS_MCS8;
+		break;
+	case DESC_RATEVHT3SS_MCS9:
+		ret_rate = MGN_VHT3SS_MCS9;
+		break;
+	case DESC_RATEVHT4SS_MCS0:
+		ret_rate = MGN_VHT4SS_MCS0;
+		break;
+	case DESC_RATEVHT4SS_MCS1:
+		ret_rate = MGN_VHT4SS_MCS1;
+		break;
+	case DESC_RATEVHT4SS_MCS2:
+		ret_rate = MGN_VHT4SS_MCS2;
+		break;
+	case DESC_RATEVHT4SS_MCS3:
+		ret_rate = MGN_VHT4SS_MCS3;
+		break;
+	case DESC_RATEVHT4SS_MCS4:
+		ret_rate = MGN_VHT4SS_MCS4;
+		break;
+	case DESC_RATEVHT4SS_MCS5:
+		ret_rate = MGN_VHT4SS_MCS5;
+		break;
+	case DESC_RATEVHT4SS_MCS6:
+		ret_rate = MGN_VHT4SS_MCS6;
+		break;
+	case DESC_RATEVHT4SS_MCS7:
+		ret_rate = MGN_VHT4SS_MCS7;
+		break;
+	case DESC_RATEVHT4SS_MCS8:
+		ret_rate = MGN_VHT4SS_MCS8;
+		break;
+	case DESC_RATEVHT4SS_MCS9:
+		ret_rate = MGN_VHT4SS_MCS9;
+		break;
+	default:
+		ret_rate = MGN_UNKNOWN;
+		break;
+	}
+
+	return ret_rate;
+}
+EXPORT_SYMBOL(rtl_hw_rate_to_m_rate);
+
 static u8 _rtl_get_tx_hw_rate(struct ieee80211_hw *hw,
 			      struct ieee80211_tx_info *info)
 {
