@@ -35,6 +35,8 @@ struct rtl_phydm_ops *rtl_phydm_get_ops_pointer(void);
 #define rtlpriv_to_phydm(priv)                                                 \
 	((struct phy_dm_struct *)((priv)->phydm.internal))
 
+void rtl_odm_acquirespinlock(struct rtl_priv *rtlpriv,	enum rt_spinlock_type type);
+void rtl_odm_releasespinlock(struct rtl_priv *rtlpriv,	enum rt_spinlock_type type);
 u8 phy_get_tx_power_index(void *adapter, u8 rf_path, u8 rate,
 			  enum ht_channel_width bandwidth, u8 channel);
 void phy_set_tx_power_index_by_rs(void *adapter, u8 ch, u8 path, u8 rs);
@@ -44,7 +46,15 @@ void phy_set_tx_power_limit(void *dm, u8 *regulation, u8 *band, u8 *bandwidth,
 			    u8 *rate_section, u8 *rf_path, u8 *channel,
 			    u8 *power_limit);
 
-void rtl_hal_update_ra_mask(void *adapter, struct rtl_sta_info *psta,
-			    u8 rssi_level);
+#if 0
+void rtw_phydm_update_ra_mask(struct cmn_sta_info *pcmn_info, u8 rssi_level, u8 is_update_bw);
+#endif
+
+u8 rtl_efuse_onebyte_read(void *adapter, u16 addr, u8 *data,
+			bool bPseudoTest);
+
+void rtl_efuse_logical_map_read(void *adapter, u8 Type, u16 Offset,
+			u32 *Value);
+enum hal_status rtl_phydm_fw_iqk(void *adapter, u8 clear,	u8 segment);
 
 #endif
