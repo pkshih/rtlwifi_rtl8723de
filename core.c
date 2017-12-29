@@ -938,6 +938,8 @@ static int rtl_op_sta_add(struct ieee80211_hw *hw,
 
 			if (vif->type == NL80211_IFTYPE_ADHOC)
 				sta_entry->wireless_mode = WIRELESS_MODE_A;
+
+			mac->mode = sta_entry->wireless_mode;
 		}
 		/*disable cck rate for p2p*/
 		if (mac->p2p)
@@ -1185,9 +1187,11 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 					mac->mode = WIRELESS_MODE_AC_24G;
 			}
 
-			if (vif->type == NL80211_IFTYPE_STATION)
+			if (vif->type == NL80211_IFTYPE_STATION) {
+				sta_entry->wireless_mode = mac->mode;
 				rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0,
 								   true);
+			}
 			rcu_read_unlock();
 
 			/* to avoid AP Disassociation caused by inactivity */
