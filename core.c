@@ -969,8 +969,10 @@ static int rtl_op_sta_add(struct ieee80211_hw *hw,
 			"Add sta addr is %pM\n", sta->addr);
 		rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0, true);
 
-		if (rtlpriv->phydm.ops)
+		if (rtlpriv->phydm.ops) {
 			rtlpriv->phydm.ops->phydm_add_sta(rtlpriv, sta);
+			rtlpriv->phydm.ops->phydm_ra_registered(rtlpriv, sta);
+		}
 
 		rtlpriv->sta = sta_entry;
 	}
@@ -1207,6 +1209,9 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 				sta_entry->wireless_mode = mac->mode;
 				rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0,
 								   true);
+				if (dm_ops)
+					dm_ops->phydm_ra_registered(rtlpriv,
+						sta);
 			}
 			rcu_read_unlock();
 
@@ -1500,6 +1505,9 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 			sta_entry = (struct rtl_sta_info *)sta->drv_priv;
 			sta_entry->wireless_mode = mac->mode;
 			rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0, true);
+			if (rtlpriv->phydm.ops)
+				rtlpriv->phydm.ops->phydm_ra_registered(rtlpriv,
+					sta);
 		}
 
 		if (sta->ht_cap.ht_supported) {

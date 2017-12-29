@@ -2745,6 +2745,8 @@ struct rtl_phydm_ops {
 				    u8 tx_rate_level, /* 0~6 */
 				    u32 *tx_bitmap_msb,
 				    u32 *tx_bitmap_lsb);
+	void (*phydm_ra_registered)(struct rtl_priv *rtlpriv,
+			      struct ieee80211_sta *sta);
 
 	/* STA */
 	bool (*phydm_add_sta)(struct rtl_priv *rtlpriv,
@@ -2774,6 +2776,7 @@ struct rtl_phydm {
 	u16 forced_data_rate;	/*For fix rate */
 	u8 forced_igi_lb;
 	u8 antenna_test;	/*For mp to switch RF path */
+	u8 phydm_op_mode;
 };
 
 struct proxim {

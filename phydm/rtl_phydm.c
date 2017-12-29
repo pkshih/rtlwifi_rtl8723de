@@ -1047,6 +1047,7 @@ static struct rtl_phydm_ops rtl_phydm_operation = {
 	/* TX */
 	.phydm_rate_id_mapping = rtl_phydm_rate_id_mapping,
 	.phydm_get_ra_bitmap = rtl_phydm_get_ra_bitmap,
+	.phydm_ra_registered = rtl_phydm_ra_registered,
 
 	/* STA */
 	.phydm_add_sta = rtl_phydm_add_sta,
