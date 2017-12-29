@@ -1332,6 +1332,125 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 					      &mac->current_ampdu_density);
 	}
 
+	if (changed & BSS_CHANGED_BANDWIDTH) {
+		struct rtl_phy *rtlphy = &rtlpriv->phy;
+		struct ieee80211_sta *sta = NULL;
+		struct rtl_sta_info *sta_entry = NULL;
+		enum nl80211_chan_width width = bss_conf->chandef.width;
+		enum nl80211_channel_type channel_type = NL80211_CHAN_NO_HT;
+
+		RT_TRACE(rtlpriv, COMP_MAC80211, DBG_TRACE,
+			 "BSS_CHANGED_BANDWIDTH\n");
+
+		/* channel_type is for 20&40M */
+		if (width < NL80211_CHAN_WIDTH_80)
+			channel_type =
+				cfg80211_get_chandef_type(&hw->conf.chandef);
+
+		if (width >= NL80211_CHAN_WIDTH_80) {
+			if (width == NL80211_CHAN_WIDTH_80) {
+				u32 center = hw->conf.chandef.center_freq1;
+				u32 primary =
+					(u32)hw->conf.chandef.chan->center_freq;
+
+				rtlphy->current_chan_bw = HT_CHANNEL_WIDTH_80;
+				mac->bw_80 = true;
+				mac->bw_40 = true;
+				if (center > primary) {
+					mac->cur_80_prime_sc =
+						PRIME_CHNL_OFFSET_LOWER;
+					if (center - primary == 10) {
+						mac->cur_40_prime_sc =
+							PRIME_CHNL_OFFSET_UPPER;
+					} else if (center - primary == 30) {
+						mac->cur_40_prime_sc =
+							PRIME_CHNL_OFFSET_LOWER;
+					}
+				} else {
+					mac->cur_80_prime_sc =
+						PRIME_CHNL_OFFSET_UPPER;
+					if (primary - center == 10) {
+						mac->cur_40_prime_sc =
+							PRIME_CHNL_OFFSET_LOWER;
+					} else if (primary - center == 30) {
+						mac->cur_40_prime_sc =
+							PRIME_CHNL_OFFSET_UPPER;
+					}
+				}
+			}
+		} else {
+			switch (channel_type) {
+			case NL80211_CHAN_HT20:
+			case NL80211_CHAN_NO_HT:
+					/* SC */
+					mac->cur_40_prime_sc =
+						PRIME_CHNL_OFFSET_DONT_CARE;
+					rtlphy->current_chan_bw =
+						HT_CHANNEL_WIDTH_20;
+					mac->bw_40 = false;
+					mac->bw_80 = false;
+					break;
+			case NL80211_CHAN_HT40MINUS:
+					/* SC */
+					mac->cur_40_prime_sc =
+						PRIME_CHNL_OFFSET_UPPER;
+					rtlphy->current_chan_bw =
+						HT_CHANNEL_WIDTH_20_40;
+					mac->bw_40 = true;
+					mac->bw_80 = false;
+					break;
+			case NL80211_CHAN_HT40PLUS:
+					/* SC */
+					mac->cur_40_prime_sc =
+						PRIME_CHNL_OFFSET_LOWER;
+					rtlphy->current_chan_bw =
+						HT_CHANNEL_WIDTH_20_40;
+					mac->bw_40 = true;
+					mac->bw_80 = false;
+					break;
+			default:
+					mac->bw_40 = false;
+					mac->bw_80 = false;
+					RT_TRACE(rtlpriv, COMP_ERR, DBG_WARNING,
+						 "switch case %#x not handled\n",
+						 channel_type);
+					break;
+			}
+		}
+
+		rtlpriv->cfg->ops->set_bw_mode(hw, channel_type);
+		if (rtlpriv->phydm.ops)
+			rtlpriv->phydm.ops->phydm_iq_calibrate(rtlpriv);
+
+		rcu_read_lock();
+		sta = ieee80211_find_sta(vif, (u8 *)bss_conf->bssid);
+
+		if (sta) {
+			struct rtl_phydm_ops *dm_ops = rtlpriv->phydm.ops;
+
+			sta_entry = (struct rtl_sta_info *)sta->drv_priv;
+			sta_entry->cmn_info.bw_mode = rtlphy->current_chan_bw;
+			rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0, true);
+			if (dm_ops)
+				dm_ops->phydm_ra_registered(rtlpriv, sta);
+
+			if (sta->ht_cap.ht_supported) {
+				if (sta->ht_cap.cap &
+				    IEEE80211_HT_CAP_SUP_WIDTH_20_40)
+					rtlphy->max_ht_chan_bw =
+						HT_CHANNEL_WIDTH_20_40;
+				else
+					rtlphy->max_ht_chan_bw =
+						HT_CHANNEL_WIDTH_20;
+			}
+
+		} else {
+			RT_TRACE(rtlpriv, COMP_MAC80211, DBG_WARNING,
+				 "Warnning!!sta is NULL ( line%d)\n", __LINE__);
+		}
+		rcu_read_unlock();
+	}
+
 	if (changed & BSS_CHANGED_BSSID) {
 		u32 basic_rates;
 		struct ieee80211_sta *sta = NULL;
