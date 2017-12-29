@@ -1337,7 +1337,6 @@ struct rtl_sta_info {
 	u16 wireless_mode;
 	u8 ratr_index;
 	u8 mimo_ps;
-	u8 mac_addr[ETH_ALEN];
 	u64 txbytes;	/* total tx bytes */
 	u64 last_txbytes;
 	u64 txbytes_inperiod;

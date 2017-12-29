@@ -964,7 +964,6 @@ static int rtl_op_sta_add(struct ieee80211_hw *hw,
 		RT_TRACE(rtlpriv, COMP_MAC80211, DBG_DMESG,
 			 "bw_mode: %d\n", sta_entry->cmn_info.bw_mode);
 
-		memcpy(sta_entry->mac_addr, sta->addr, ETH_ALEN);
 		memcpy(sta_entry->cmn_info.mac_addr, sta->addr, ETH_ALEN);
 		RT_TRACE(rtlpriv, COMP_MAC80211, DBG_DMESG,
 			"Add sta addr is %pM\n", sta->addr);

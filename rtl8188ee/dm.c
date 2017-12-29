@@ -1614,16 +1614,16 @@ static void rtl88e_set_next_mac_address_target(struct ieee80211_hw *hw)
 					if (j != pfat_table->train_idx)
 						continue;
 
-					value32 = (drv_priv->mac_addr[5] << 8) |
-						  drv_priv->mac_addr[4];
+					value32 = (drv_priv->cmn_info.mac_addr[5] << 8) |
+						  drv_priv->cmn_info.mac_addr[4];
 					rtl_set_bbreg(hw,
 						      DM_REG_ANT_TRAIN_PARA2_11N,
 						      MASKLWORD, value32);
 
-					value32 = (drv_priv->mac_addr[3] << 24) |
-						  (drv_priv->mac_addr[2] << 16) |
-						  (drv_priv->mac_addr[1] << 8) |
-						  drv_priv->mac_addr[0];
+					value32 = (drv_priv->cmn_info.mac_addr[3] << 24) |
+						  (drv_priv->cmn_info.mac_addr[2] << 16) |
+						  (drv_priv->cmn_info.mac_addr[1] << 8) |
+						  drv_priv->cmn_info.mac_addr[0];
 					rtl_set_bbreg(hw,
 						      DM_REG_ANT_TRAIN_PARA1_11N,
 						      MASKDWORD, value32);
