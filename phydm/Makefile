@@ -80,6 +80,11 @@ phydm_mod-objs +=\
 		halrf/rtl8822b/halrf_8822b.o\
 		halrf/rtl8822b/halrf_iqk_8822b.o
 
+#phydm_mod-objs += \
+		txbf/halcomtxbf.o\
+		txbf/haltxbfinterface.o\
+		txbf/phydm_hal_txbf_api.o\
+
 phydm_mod-objs += \
 		rtl8822b/halhwimg8822b_bb.o\
 		rtl8822b/halhwimg8822b_mac.o\
@@ -87,6 +92,9 @@ phydm_mod-objs += \
 		rtl8822b/phydm_hal_api8822b.o\
 		rtl8822b/phydm_regconfig8822b.o\
 		rtl8822b/phydm_rtl8822b.o
+
+#phydm_mod-objs += \
+		txbf/haltxbf8822b.o
 
 phydm_mod-objs += \
 		rtl8723d/halhwimg8723d_bb.o \
