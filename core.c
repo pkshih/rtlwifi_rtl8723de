@@ -1225,9 +1225,15 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 			}
 
 			if (vif->type == NL80211_IFTYPE_STATION) {
+				struct rtl_phydm_ops *dm_ops =
+					rtlpriv->phydm.ops;
+
 				sta_entry->wireless_mode = mac->mode;
 				rtlpriv->cfg->ops->update_rate_tbl(hw, sta, 0,
 								   true);
+				if (dm_ops &&
+				    mac->opmode == NL80211_IFTYPE_STATION)
+					dm_ops->phydm_iq_calibrate(rtlpriv);
 				if (dm_ops)
 					dm_ops->phydm_ra_registered(rtlpriv,
 						sta);
