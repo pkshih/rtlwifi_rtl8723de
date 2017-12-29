@@ -954,7 +954,7 @@ void phydm_rx_rate_distribution(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _odm_phy_dbg_info_ *p_dbg = &p_dm->phy_dbg_info;
-	u8 i = 0, j = 0;
+	u8 i = 0;
 	u8 rate_num = 1, rate_ss_shift = 0;
 
 	if (p_dm->support_ic_type & ODM_IC_4SS)
@@ -1212,7 +1212,6 @@ void phydm_basic_dbg_message(void *p_dm_void)
 		(struct phydm_cfo_track_struct *)phydm_get_structure(
 			p_dm, PHYDM_CFOTRACK);
 	struct phydm_dig_struct *p_dig_t = &p_dm->dm_dig_table;
-	struct _rate_adaptive_table_ *p_ra_table = &p_dm->dm_ra_table;
 	u16 macid, phydm_macid, client_cnt = 0;
 	struct cmn_sta_info *p_entry = NULL;
 	s32 tmp_val = 0;
@@ -2693,7 +2692,6 @@ void phydm_parameter_adjust(void *p_dm_void, char input[][16], u32 *_used,
 	u32 var1[10] = {0};
 	u32 used = *_used;
 	u32 out_len = *_out_len;
-	u8 i;
 
 	if ((strcmp(input[1], help) == 0)) {
 		PHYDM_SNPRINTF((output + used, out_len - used,

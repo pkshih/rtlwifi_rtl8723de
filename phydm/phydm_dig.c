@@ -942,7 +942,9 @@ void phydm_dig_by_rssi_lps(void *p_dm_void)
 void phydm_false_alarm_counter_reg_reset(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+#ifdef PHYDM_TDMA_DIG_SUPPORT
 	struct phydm_dig_struct *p_dig_t = &p_dm->dm_dig_table;
+#endif
 	struct phydm_fa_struct *p_falm_cnt = &p_dm->false_alm_cnt;
 #ifdef PHYDM_TDMA_DIG_SUPPORT
 	struct phydm_fa_acc_struct *p_falm_cnt_acc = &p_dm->false_alm_cnt_acc;

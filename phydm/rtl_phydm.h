@@ -35,6 +35,8 @@ struct rtl_phydm_ops *rtl_phydm_get_ops_pointer(void);
 #define rtlpriv_to_phydm(priv)                                                 \
 	((struct phy_dm_struct *)((priv)->phydm.internal))
 
+enum rt_spinlock_type;
+
 void rtl_odm_acquirespinlock(struct rtl_priv *rtlpriv,
 			     enum rt_spinlock_type type);
 void rtl_odm_releasespinlock(struct rtl_priv *rtlpriv,

@@ -99,11 +99,6 @@ static boolean check_positive(struct PHY_DM_STRUCT *p_dm_odm,
 	else
 		return false;
 }
-static boolean check_negative(struct PHY_DM_STRUCT *p_dm_odm,
-			      const u32 condition1, const u32 condition2)
-{
-	return true;
-}
 
 /******************************************************************************
 *                           agc_tab.TXT

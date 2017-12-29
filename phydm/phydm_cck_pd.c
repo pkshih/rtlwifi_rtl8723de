@@ -129,7 +129,10 @@ boolean phydm_stop_cck_pd_th(void *p_dm_void)
 void phydm_cckpd(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
+#else
 	struct phydm_dig_struct *p_dig_t = &p_dm->dm_dig_table;
+#endif
 	struct phydm_cckpd_struct *p_cckpd_t = &p_dm->dm_cckpd_table;
 	u8 cur_cck_cca_th = p_cckpd_t->cur_cck_cca_thres;
 

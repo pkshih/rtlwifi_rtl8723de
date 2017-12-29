@@ -96,7 +96,6 @@ void phydm_ra_debug(void *p_dm_void, char input[][16], u32 *_used, char *output,
 	char help[] = "-h";
 	u32 var1[5] = {0};
 	u8 i = 0;
-	u32 reg_u32_tmp;
 
 	for (i = 0; i < 5; i++) {
 		if (input[i + 1])
@@ -1622,7 +1621,6 @@ u8 phydm_rate2ss(void *p_dm_void, u8 rate_idx)
 u8 phydm_rate2plcp(void *p_dm_void, u8 rate_idx)
 {
 	u8 rate2ss = 0;
-	u8 vht_en = 0;
 	u8 ltftime = 0;
 	u8 plcptime = 0xff;
 

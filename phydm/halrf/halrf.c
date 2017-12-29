@@ -328,7 +328,6 @@ void halrf_iqk_info_dump(void *p_dm_void, u32 *_used, char *output,
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u32 used = *_used;
 	u32 out_len = *_out_len;
-	u8 path, num, i;
 
 	u8 rf_path, j, reload_iqk = 0;
 	u32 tmp;
@@ -450,8 +449,7 @@ void halrf_get_fw_version(void *p_dm_void)
 void halrf_iqk_dbg(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	u8 rf_path, j, reload_iqk = 0;
-	u8 path, num, i;
+	u8 rf_path, j;
 	u32 tmp;
 	boolean iqk_result[2][NUM]
 			  [2]; /*two channel, PATH, TX/RX, 0:pass 1 :fail*/
@@ -770,7 +768,6 @@ void halrf_iqk_debug(void *p_dm_void, u32 *const dm_value, u32 *_used,
 		     char *output, u32 *_out_len)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _IQK_INFORMATION *p_iqk_info = &p_dm->IQK_info;
 
 	/*dm_value[0]=0x0: backup from SRAM & show*/
 	/*dm_value[0]=0x1: write backup CFIR to SRAM*/
@@ -902,7 +899,6 @@ void halrf_segment_iqk_trigger(void *p_dm_void, boolean clear,
 void halrf_rf_lna_setting(void *p_dm_void, enum phydm_lna_set type)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _hal_rf_ *p_rf = &p_dm->rf_table;
 
 	switch (p_dm->support_ic_type) {
 #if (RTL8188E_SUPPORT == 1)

@@ -11,7 +11,7 @@ ccflags-y += -DRTL8188E_SUPPORT=0
 ccflags-y += -DRTL8812A_SUPPORT=0
 ccflags-y += -DRTL8821A_SUPPORT=0
 ccflags-y += -DRTL8723B_SUPPORT=0
-ccflags-y += -DRTL8723D_SUPPORT=0
+ccflags-y += -DRTL8723D_SUPPORT=1
 ccflags-y += -DRTL8192E_SUPPORT=0
 ccflags-y += -DRTL8814A_SUPPORT=0
 ccflags-y += -DRTL8195A_SUPPORT=0
@@ -87,6 +87,14 @@ phydm_mod-objs += \
 		rtl8822b/phydm_hal_api8822b.o\
 		rtl8822b/phydm_regconfig8822b.o\
 		rtl8822b/phydm_rtl8822b.o
+
+phydm_mod-objs += \
+		rtl8723d/halhwimg8723d_bb.o \
+		rtl8723d/halhwimg8723d_mac.o \
+		rtl8723d/halhwimg8723d_rf.o \
+		rtl8723d/phydm_regconfig8723d.o \
+		rtl8723d/phydm_rtl8723d.o \
+		halrf/rtl8723d/halrf_8723d.o \
 
 phydm_mod-objs += \
 		rtl_phydm.o

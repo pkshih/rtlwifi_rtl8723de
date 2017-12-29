@@ -361,7 +361,10 @@ rtw_phydm_cfg_phy_para(
 		#include "rtl8723d/version_rtl8723d.h"
 	#endif
 	#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-		#include "rtl8723d_hal.h"
+		#ifdef DM_ODM_CE_MAC80211
+		#else
+			#include "rtl8723d_hal.h"
+		#endif
 	#endif
 #endif /* 8723D End */
 

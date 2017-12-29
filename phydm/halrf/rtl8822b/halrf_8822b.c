@@ -225,7 +225,9 @@ void odm_tx_pwr_track_set_pwr8822b(void *p_dm_void, enum pwrtrack_method method,
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct odm_rf_calibration_structure *p_rf_calibrate_info =
 		&p_dm->rf_calibrate_info;
+#if (DM_ODM_SUPPORT_TYPE & ODM_CE) && !defined(DM_ODM_CE_MAC80211)
 	struct _hal_rf_ *p_rf = &p_dm->rf_table;
+#endif
 	u8 tx_power_index_offest = 0;
 	u8 tx_power_index = 0;
 

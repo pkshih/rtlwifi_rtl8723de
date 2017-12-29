@@ -187,7 +187,6 @@ enum rt_spinlock_type {
 #define RTL8812A_SUPPORT 0
 #define RTL8821A_SUPPORT 0
 #define RTL8723B_SUPPORT 0
-#define RTL8723D_SUPPORT 0
 #define RTL8192E_SUPPORT 0
 #define RTL8814A_SUPPORT 0
 #define RTL8195A_SUPPORT 0

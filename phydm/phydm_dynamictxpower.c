@@ -32,8 +32,8 @@
 /* *********************Power training init************************ */
 void phydm_pow_train_init(void *p_dm_void)
 {
-	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _ADAPTER	*adapter = p_dm->adapter;
 	PMGNT_INFO			p_mgnt_info = &adapter->MgntInfo;
 	HAL_DATA_TYPE		*p_hal_data = GET_HAL_DATA(adapter);

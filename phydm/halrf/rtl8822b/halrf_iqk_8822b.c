@@ -873,7 +873,6 @@ boolean _lok_one_shot_8822b(void *p_dm_void, u8 path)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _IQK_INFORMATION *p_iqk_info = &p_dm->IQK_info;
-	u8 delay_count = 0;
 	boolean LOK_notready = false;
 	u32 LOK_temp = 0;
 	u32 IQK_CMD = 0x0;
@@ -910,7 +909,7 @@ boolean _iqk_one_shot_8822b(void *p_dm_void, u8 path, u8 idx)
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _IQK_INFORMATION *p_iqk_info = &p_dm->IQK_info;
 	u8 delay_count = 0;
-	boolean notready = true, fail = true;
+	boolean fail = true;
 	u32 IQK_CMD = 0x0;
 	u16 iqk_apply[2] = {BBREG_0xc94, BBREG_0xe94};
 
@@ -1469,7 +1468,6 @@ void _phy_iq_calibrate_by_fw_8822b(void *p_dm_void, u8 clear, u8 segment_iqk)
 void phy_iq_calibrate_8822b(void *p_dm_void, boolean clear, boolean segment_iqk)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _hal_rf_ *p_rf = &p_dm->rf_table;
 
 	if (*p_dm->p_mp_mode)
 		halrf_iqk_hwtx_check(p_dm, true);

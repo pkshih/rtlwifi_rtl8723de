@@ -70,9 +70,11 @@ void phydm_dig_up_bound_lmt_en(void *p_dm_void)
 void phydm_check_adaptivity(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN) || (DM_ODM_SUPPORT_TYPE == ODM_AP)
 	struct phydm_adaptivity_struct *adaptivity =
 		(struct phydm_adaptivity_struct *)phydm_get_structure(
 			p_dm, PHYDM_ADAPTIVITY);
+#endif
 
 	if (!(p_dm->support_ability & ODM_BB_ADAPTIVITY)) {
 		p_dm->adaptivity_enable = false;

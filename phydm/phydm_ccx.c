@@ -66,9 +66,7 @@ void phydm_fahm_trigger(void *p_dm_void, u16 trigger_period /*unit (4us)*/
 			)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _CCX_INFO *ccx_info = &p_dm->dm_ccx_info;
 	u32 fahm_reg1;
-	u32 fahm_reg2;
 
 	if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
 		odm_set_bb_reg(p_dm, BBREG_0x1cf8, 0xffff00, trigger_period);
@@ -119,7 +117,6 @@ void phydm_fahm_set_valid_cnt(void *p_dm_void, u8 numerator_sel,
 void phydm_fahm_get_result(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _CCX_INFO *ccx_info = &p_dm->dm_ccx_info;
 	u16 fahm_rpt_cnt[12]; /*packet count*/
 	u16 fahm_rpt[12]; /*percentage*/
 	u16 fahm_denumerator; /*packet count*/
@@ -1130,7 +1127,6 @@ void phydm_clm_c2h_report_handler(void *p_dm_void, u8 *cmd_buf, u8 cmd_len)
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _CCX_INFO *ccx_info = &p_dm->dm_ccx_info;
 	u8 clm_report = cmd_buf[0];
-	u8 clm_report_idx = cmd_buf[1];
 
 	if (cmd_len >= 12)
 		return;

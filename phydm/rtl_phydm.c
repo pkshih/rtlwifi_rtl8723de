@@ -510,7 +510,6 @@ static bool rtl_phydm_trx_mode(struct rtl_priv *rtlpriv,
 static u8 _rtl_phydm_rfk_condition_check(struct rtl_priv *rtlpriv)
 {
 	u8 rst = false;
-	struct phy_dm_struct *dm = rtlpriv_to_phydm(rtlpriv);
 
 	/*ToDo: check */
 	rst = true;
@@ -521,7 +520,6 @@ static u8 _rtl_phydm_rfk_condition_check(struct rtl_priv *rtlpriv)
 static u8 _rtl_phydm_iqk_segment_chk(struct rtl_priv *rtlpriv)
 {
 	u8 rst = false;
-	struct phy_dm_struct *dm = rtlpriv_to_phydm(rtlpriv);
 
 	/*ToDo: check */
 	rst = true;

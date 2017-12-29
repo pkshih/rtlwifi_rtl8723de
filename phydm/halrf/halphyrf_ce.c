@@ -1239,7 +1239,11 @@ u8 odm_get_right_chnl_place_for_iqk(u8 chnl)
 
 void odm_iq_calibrate(struct PHY_DM_STRUCT *p_dm)
 {
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
+#if RTL8812A_SUPPORT
 	struct _ADAPTER *adapter = p_dm->adapter;
+#endif
+#endif
 	struct _IQK_INFORMATION *p_iqk_info = &p_dm->IQK_info;
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
@@ -1248,8 +1252,10 @@ void odm_iq_calibrate(struct PHY_DM_STRUCT *p_dm)
 #endif
 
 #if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
+#if RTL8812A_SUPPORT
 	if (IS_HARDWARE_TYPE_8812AU(adapter))
 		return;
+#endif
 #endif
 
 	if ((p_dm->is_linked) && (!p_iqk_info->rfk_forbidden)) {

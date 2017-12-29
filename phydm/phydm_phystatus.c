@@ -1121,7 +1121,7 @@ void phydm_rx_phy_status_jaguar_series_parsing(
 	u8 i, max_spatial_stream;
 	s8 rx_pwr[4], rx_pwr_all = 0;
 	u8 EVM = 0, evm_dbm, pwdb_all = 0, pwdb_all_bt;
-	u8 RSSI, avg_rssi = 0;
+	u8 RSSI;
 	u8 rf_rx_num = 0;
 	u8 cck_highpwr = 0;
 	u8 LNA_idx, VGA_idx;
@@ -1975,12 +1975,6 @@ void phydm_print_phy_status_jarguar2(struct PHY_DM_STRUCT *p_dm,
 				     struct phydm_phyinfo_struct *p_phy_info,
 				     u8 phy_status_page_num)
 {
-	struct _phy_status_rpt_jaguar2_type0 *p_rpt0 =
-		(struct _phy_status_rpt_jaguar2_type0 *)p_phy_status;
-	struct _phy_status_rpt_jaguar2_type1 *p_rpt =
-		(struct _phy_status_rpt_jaguar2_type1 *)p_phy_status;
-	struct _phy_status_rpt_jaguar2_type2 *p_rpt2 =
-		(struct _phy_status_rpt_jaguar2_type2 *)p_phy_status;
 	struct _odm_phy_dbg_info_ *p_dbg = &p_dm->phy_dbg_info;
 	u32 phy_status[PHY_STATUS_JRGUAR2_DW_LEN] = {0};
 	u8 i;

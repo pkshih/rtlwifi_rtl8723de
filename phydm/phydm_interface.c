@@ -260,6 +260,8 @@ enum hal_status phydm_set_reg_by_fw(struct PHY_DM_STRUCT *p_dm,
 #if (DM_ODM_SUPPORT_TYPE & ODM_CE) && defined(DM_ODM_CE_MAC80211)
 	PHYDM_DBG(p_dm_odm, ODM_COMP_COMMON,
 		  ("Not support for CE MAC80211 driver!\n"));
+
+	return HAL_STATUS_FAILURE;
 #else
 	return rtw_phydm_cfg_phy_para(p_dm,
 							config_type,
@@ -269,6 +271,8 @@ enum hal_status phydm_set_reg_by_fw(struct PHY_DM_STRUCT *p_dm,
 							e_rf_path,
 							delay_time);
 #endif
+#else
+	return HAL_STATUS_FAILURE;
 #endif
 }
 

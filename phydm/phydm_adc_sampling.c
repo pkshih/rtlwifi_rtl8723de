@@ -88,7 +88,11 @@ void phydm_la_get_tx_pkt_buf(void *p_dm_void)
 	boolean is_round_up;
 	static u32 page = 0xFF;
 	u32 smp_cnt = 0, smp_number = 0, addr_8byte = 0;
+	#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
+	#if (RTL8197F_SUPPORT)
 	u8 backup_dma = 0;
+	#endif
+	#endif
 
 	odm_memory_set(p_dm, adc_smp_buf->octet, 0, adc_smp_buf->length);
 	odm_write_1byte(p_dm, 0x0106, 0x69);

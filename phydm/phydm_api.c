@@ -149,8 +149,8 @@ void phydm_init_trx_antenna_setting(void *p_dm_void)
 
 void phydm_config_ofdm_tx_path(void *p_dm_void, u32 path)
 {
-	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 #if ((RTL8192E_SUPPORT == 1) || (RTL8812A_SUPPORT == 1))
+	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8	ofdm_tx_path = 0x33;
 #endif
 
@@ -479,10 +479,10 @@ u8 phydm_stop_ic_trx(void *p_dm_void, u8 set_type)
 void phydm_set_ext_switch(void *p_dm_void, u32 *const dm_value, u32 *_used,
 			  char *output, u32 *_out_len)
 {
+#if (RTL8821A_SUPPORT == 1) || (RTL8881A_SUPPORT == 1)
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u32 ext_ant_switch = dm_value[0];
 
-#if (RTL8821A_SUPPORT == 1) || (RTL8881A_SUPPORT == 1)
 	if (p_dm->support_ic_type & (ODM_RTL8821 | ODM_RTL8881A)) {
 		/*Output Pin Settings*/
 		odm_set_mac_reg(p_dm, 0x4C, BIT(23), 0); /*select DPDT_P and DPDT_N as output pin*/
@@ -1088,7 +1088,6 @@ boolean phydm_api_set_txagc(void *p_dm_void, u32 power_index, enum rf_path path,
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	boolean ret = false;
-	u8 i;
 
 #if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1))
 	if (p_dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8821C)) {
