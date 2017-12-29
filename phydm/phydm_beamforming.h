@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -227,6 +237,12 @@ struct _RT_BEAMFORMING_INFO {
 };
 
 
+void
+phydm_get_txbf_device_num(
+	void	*p_dm_void,
+	u8	macid
+);
+
 struct _RT_NDPA_STA_INFO {
 	u16	aid:12;
 	u16	feedback_type:1;
@@ -377,19 +393,18 @@ beamforming_send_vht_ndpa_packet(
 
 #else
 #define beamforming_gid_paid(adapter, p_tcb)
-#define	phydm_acting_determine(p_dm, type)	false
+#define phydm_acting_determine(p_dm, type) false
 #define beamforming_enter(p_dm, sta_idx)
 #define beamforming_leave(p_dm, RA)
 #define beamforming_end_fw(p_dm)
-#define beamforming_control_v1(p_dm, RA, AID, mode, BW, rate)		true
-#define beamforming_control_v2(p_dm, idx, mode, BW, period)		true
+#define beamforming_control_v1(p_dm, RA, AID, mode, BW, rate) true
+#define beamforming_control_v2(p_dm, idx, mode, BW, period) true
 #define phydm_beamforming_end_sw(p_dm, _status)
 #define beamforming_timer_callback(p_dm)
 #define phydm_beamforming_init(p_dm)
-#define phydm_beamforming_control_v2(p_dm, _idx, _mode, _BW, _period)	false
+#define phydm_beamforming_control_v2(p_dm, _idx, _mode, _BW, _period) false
 #define beamforming_watchdog(p_dm)
 #define phydm_beamforming_watchdog(p_dm)
-
 
 #endif
 #endif

@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -19,32 +29,29 @@
 
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
- 
+
 #ifdef PHYDM_SUPPORT_RSSI_MONITOR
 
 #ifdef PHYDM_3RD_REFORM_RSSI_MONOTOR
-void
-phydm_rssi_monitor_h2c(
-	void	*p_dm_void,
-	u8	macid
-)
+void phydm_rssi_monitor_h2c(void *p_dm_void, u8 macid)
 {
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_	*p_ra_t = &p_dm->dm_ra_table;
-	struct cmn_sta_info			*p_sta = p_dm->p_phydm_sta_info[macid];
-	struct ra_sta_info				*p_ra = NULL;
-	u8		h2c_val[H2C_MAX_LENGTH] = {0};
-	u8		stbc_en, ldpc_en;
-	u8		bf_en = 0;
-	u8		is_rx, is_tx;
+	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+	struct _rate_adaptive_table_ *p_ra_t = &p_dm->dm_ra_table;
+	struct cmn_sta_info *p_sta = p_dm->p_phydm_sta_info[macid];
+	struct ra_sta_info *p_ra = NULL;
+	u8 h2c_val[H2C_MAX_LENGTH] = {0};
+	u8 stbc_en, ldpc_en;
+	u8 bf_en = 0;
+	u8 is_rx, is_tx;
 
 	if (is_sta_active(p_sta)) {
-		p_ra = &(p_sta->ra_info);
+		p_ra = &p_sta->ra_info;
 	} else {
-		PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("[Warning] %s invalid sta_info\n", __func__));
+		PHYDM_DBG(p_dm, DBG_RSSI_MNTR,
+			  ("[Warning] %s invalid sta_info\n", __func__));
 		return;
 	}
-	
+
 	PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("%s ======>\n", __func__));
 	PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("MACID=%d\n", p_sta->mac_id));
 
@@ -61,20 +68,26 @@ phydm_rssi_monitor_h2c(
 	#endif
 
 	if (p_ra_t->RA_threshold_offset != 0) {
-		PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("RA_th_ofst = (( %s%d ))\n",
-			((p_ra_t->RA_offset_direction) ? "+" : "-"), p_ra_t->RA_threshold_offset));
+		PHYDM_DBG(p_dm, DBG_RSSI_MNTR,
+			  ("RA_th_ofst = (( %s%d ))\n",
+			   ((p_ra_t->RA_offset_direction) ? "+" : "-"),
+			   p_ra_t->RA_threshold_offset));
 	}
 
 	h2c_val[0] = p_sta->mac_id;
 	h2c_val[1] = 0;
 	h2c_val[2] = p_sta->rssi_stat.rssi;
-	h2c_val[3] = is_rx | (stbc_en << 1) | ((p_dm->noisy_decision & 0x1) << 2) |  (bf_en << 6);
-	h2c_val[4] = (p_ra_t->RA_threshold_offset & 0x7f) | ((p_ra_t->RA_offset_direction & 0x1) << 7);
+	h2c_val[3] = is_rx | (stbc_en << 1) |
+		     ((p_dm->noisy_decision & 0x1) << 2) | (bf_en << 6);
+	h2c_val[4] = (p_ra_t->RA_threshold_offset & 0x7f) |
+		     ((p_ra_t->RA_offset_direction & 0x1) << 7);
 	h2c_val[5] = 0;
 	h2c_val[6] = 0;
 
-	PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("PHYDM h2c[0x42]=0x%x %x %x %x %x %x %x\n",
-		h2c_val[6], h2c_val[5], h2c_val[4], h2c_val[3], h2c_val[2], h2c_val[1], h2c_val[0]));
+	PHYDM_DBG(p_dm, DBG_RSSI_MNTR,
+		  ("PHYDM h2c[0x42]=0x%x %x %x %x %x %x %x\n", h2c_val[6],
+		   h2c_val[5], h2c_val[4], h2c_val[3], h2c_val[2], h2c_val[1],
+		   h2c_val[0]));
 
 	#if (RTL8188E_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8188E)
@@ -82,20 +95,18 @@ phydm_rssi_monitor_h2c(
 	else
 	#endif 
 	{
-		odm_fill_h2c_cmd(p_dm, ODM_H2C_RSSI_REPORT, H2C_MAX_LENGTH, h2c_val);
+		odm_fill_h2c_cmd(p_dm, ODM_H2C_RSSI_REPORT, H2C_MAX_LENGTH,
+				 h2c_val);
 	}
 }
 
-void
-phydm_calculate_rssi_min_max(
-	void		*p_dm_void
-)
+void phydm_calculate_rssi_min_max(void *p_dm_void)
 {
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct cmn_sta_info		*p_sta;
-	s8	rssi_max_tmp = 0, rssi_min_tmp = 100;
-	u8	i;
-	u8	sta_cnt = 0;
+	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+	struct cmn_sta_info *p_sta;
+	s8 rssi_max_tmp = 0, rssi_min_tmp = 100;
+	u8 i;
+	u8 sta_cnt = 0;
 
 	if (!p_dm->is_linked)
 		return;
@@ -105,7 +116,6 @@ phydm_calculate_rssi_min_max(
 	for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
 		p_sta = p_dm->p_phydm_sta_info[i];
 		if (is_sta_active(p_sta)) {
-
 			sta_cnt++;
 
 			if (p_sta->rssi_stat.rssi < rssi_min_tmp)
@@ -125,10 +135,8 @@ phydm_calculate_rssi_min_max(
 
 	p_dm->rssi_max = (u8)rssi_max_tmp;
 	p_dm->rssi_min = (u8)rssi_min_tmp;
-
 }
 #endif
-
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 
@@ -141,7 +149,7 @@ phydm_find_minimum_rssi(
 )
 {
 	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-	PMGNT_INFO		p_mgnt_info = &(p_adapter->MgntInfo);
+	PMGNT_INFO		p_mgnt_info = &p_adapter->MgntInfo;
 	boolean			act_as_ap = ACTING_AS_AP(p_adapter);
 
 	/* 1.Determine the minimum RSSI */
@@ -205,7 +213,6 @@ odm_rssi_monitor_check_mp(
 	}
 
 	while (p_loop_adapter) {
-
 		if (p_loop_adapter != NULL) {
 			p_mgnt_info = &p_loop_adapter->MgntInfo;
 			cur_tx_ok_cnt = p_loop_adapter->TxStats.NumTxBytesUnicast - p_mgnt_info->lastTxOkCnt;
@@ -215,7 +222,6 @@ odm_rssi_monitor_check_mp(
 		}
 
 		for (i = 0; i < ASSOCIATE_ENTRY_NUM; i++) {
-
 			if (IsAPModeExist(p_loop_adapter)) {
 				if (GetFirstExtAdapter(p_loop_adapter) != NULL &&
 				    GetFirstExtAdapter(p_loop_adapter) == p_loop_adapter)
@@ -230,7 +236,6 @@ odm_rssi_monitor_check_mp(
 
 			if (p_entry != NULL) {
 				if (p_entry->bAssociated) {
-
 					RT_DISP_ADDR(FDM, DM_PWDB, ("p_entry->mac_addr ="), GET_STA_INFO(p_entry).mac_addr);
 					RT_DISP(FDM, DM_PWDB, ("p_entry->rssi = 0x%x(%d)\n",
 						GET_STA_INFO(p_entry).rssi_stat.rssi, GET_STA_INFO(p_entry).rssi_stat.rssi));
@@ -315,7 +320,6 @@ odm_rssi_monitor_check_mp(
 		PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("1 RA First Link, RSSI[%d] = ((%d)) , ra_rpt_linked = ((%d))\n",
 			WIN_DEFAULT_PORT_MACID, p_hal_data->UndecoratedSmoothedPWDB, p_hal_data->ra_rpt_linked));
 		if (p_hal_data->UndecoratedSmoothedPWDB > 0) {
-
 			PRT_HIGH_THROUGHPUT			p_ht_info = GET_HT_INFO(p_default_mgnt_info);
 			PRT_VERY_HIGH_THROUGHPUT	p_vht_info = GET_VHT_INFO(p_default_mgnt_info);
 
@@ -371,7 +375,7 @@ odm_rssi_monitor_check_mp(
 		}
 	
 	} else
-		PlatformEFIOWrite1Byte(adapter, 0x4fe, (u8)p_hal_data->UndecoratedSmoothedPWDB);
+		PlatformEFIOWrite1Byte(adapter, BBREG_0x4fe, (u8)p_hal_data->UndecoratedSmoothedPWDB);
 
 	{
 		struct _ADAPTER *p_loop_adapter = GetDefaultAdapter(adapter);
@@ -404,17 +408,15 @@ odm_rssi_monitor_check_mp(
 
 #endif
 
-void
-phydm_rssi_monitor_check(
-	void		*p_dm_void
-)
+void phydm_rssi_monitor_check(void *p_dm_void)
 {
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
 	if (!(p_dm->support_ability & ODM_BB_RSSI_MONITOR))
 		return;
 
-	if ((p_dm->phydm_sys_up_time % 2) == 1) /*for AP watchdog period = 1 sec*/
+	if ((p_dm->phydm_sys_up_time % 2) ==
+	    1) /*for AP watchdog period = 1 sec*/
 		return;
 
 	PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("%s ======>\n", __func__));
@@ -428,18 +430,13 @@ phydm_rssi_monitor_check(
 #endif
 
 	PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("RSSI {max, min} = {%d, %d}\n",
-		p_dm->rssi_max, p_dm->rssi_min));
-
+					p_dm->rssi_max, p_dm->rssi_min));
 }
 
-void
-phydm_rssi_monitor_init(
-	void		*p_dm_void
-)
+void phydm_rssi_monitor_init(void *p_dm_void)
 {
-
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_	*p_ra_table = &p_dm->dm_ra_table;
+	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+	struct _rate_adaptive_table_ *p_ra_table = &p_dm->dm_ra_table;
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
 	struct _ADAPTER		*adapter = p_dm->adapter;
 	HAL_DATA_TYPE		*p_hal_data = GET_HAL_DATA(adapter);
@@ -453,7 +450,6 @@ phydm_rssi_monitor_init(
 	p_ra_table->firstconnect = false;
 	p_dm->rssi_max = 0;
 	p_dm->rssi_min = 0;
-
 }
 
 #endif

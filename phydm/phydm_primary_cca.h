@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,23 +8,33 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
-#ifndef	__PHYDM_PRIMARYCCA_H__
-#define	__PHYDM_PRIMARYCCA_H__
+#ifndef __PHYDM_PRIMARYCCA_H__
+#define __PHYDM_PRIMARYCCA_H__
 
-#define PRIMARYCCA_VERSION	"1.0"  /*2017.03.23, Dino*/
+#define PRIMARYCCA_VERSION "1.0" /*2017.03.23, Dino*/
 
 /*============================================================*/
 /*Definition */
 /*============================================================*/
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-#define	SECOND_CH_AT_LSB	2	/*primary CH @ MSB,  SD4: HAL_PRIME_CHNL_OFFSET_UPPER*/
-#define	SECOND_CH_AT_USB	1	/*primary CH @ LSB,   SD4: HAL_PRIME_CHNL_OFFSET_LOWER*/
+#define SECOND_CH_AT_LSB 2 /*primary CH @ MSB,  SD4: HAL_PRIME_CHNL_OFFSET_UPPER*/
+#define SECOND_CH_AT_USB 1 /*primary CH @ LSB,   SD4: HAL_PRIME_CHNL_OFFSET_LOWER*/
 #elif (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 #define	SECOND_CH_AT_LSB	2	/*primary CH @ MSB,  SD7: HAL_PRIME_CHNL_OFFSET_UPPER*/
 #define	SECOND_CH_AT_USB	1	/*primary CH @ LSB,   SD7: HAL_PRIME_CHNL_OFFSET_LOWER*/
@@ -33,9 +43,9 @@
 #define	SECOND_CH_AT_USB	2	/*primary CH @ LSB,   SD8: HT_2NDCH_OFFSET_ABOVE*/
 #endif
 
-#define	OFDMCCA_TH	500
-#define	bw_ind_bias		500
-#define	PRI_CCA_MONITOR_TIME	30
+#define OFDMCCA_TH 500
+#define bw_ind_bias 500
+#define PRI_CCA_MONITOR_TIME 30
 
 #ifdef PHYDM_PRIMARY_CCA
 
@@ -49,7 +59,6 @@ enum	primary_cca_ch_position {  /*N-series REG0xc6c[8:7]*/
 };
 
 struct phydm_pricca_struct {
-
 	#if (RTL8188E_SUPPORT == 1) || (RTL8192E_SUPPORT == 1)
 	u8	pri_cca_flag;
 	u8	intf_flag;
@@ -97,21 +106,10 @@ odm_dynamic_primary_cca_8188e(
 
 #endif /*#ifdef PHYDM_PRIMARY_CCA*/
 
+boolean odm_dynamic_primary_cca_dup_rts(void *p_dm_void);
 
-boolean
-odm_dynamic_primary_cca_dup_rts(
-	void			*p_dm_void
-);
+void phydm_primary_cca_init(void *p_dm_void);
 
-void
-phydm_primary_cca_init(
-	void			*p_dm_void
-);
-
-void
-phydm_primary_cca(
-	void			*p_dm_void
-);
-
+void phydm_primary_cca(void *p_dm_void);
 
 #endif /*#ifndef	__PHYDM_PRIMARYCCA_H__*/

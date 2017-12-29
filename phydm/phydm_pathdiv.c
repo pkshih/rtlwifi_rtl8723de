@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -37,7 +47,7 @@ phydm_dtp_fix_tx_path(
 	else
 		p_dm_path_div->pre_tx_path = path;
 
-	odm_set_bb_reg(p_dm, 0x93c, BIT(18) | BIT(19), 3);
+	odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(18) | BIT(19), 3);
 
 	for (i = 0; i < 4; i++) {
 		if (path & BIT(i))
@@ -46,139 +56,139 @@ phydm_dtp_fix_tx_path(
 	PHYDM_DBG(p_dm, DBG_PATH_DIV, (" number of turn-on path : (( %d ))\n", num_enable_path));
 
 	if (num_enable_path == 1) {
-		odm_set_bb_reg(p_dm, 0x93c, 0xf00000, path);
+		odm_set_bb_reg(p_dm, BBREG_0x93c, 0xf00000, path);
 
 		if (path == BB_PATH_A) { /* 1-1 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( A ))\n"));
-			odm_set_bb_reg(p_dm, 0x93c, BIT(25) | BIT(24), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(25) | BIT(24), 0);
 		} else 	if (path == BB_PATH_B) { /* 1-2 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( B ))\n"));
-			odm_set_bb_reg(p_dm, 0x93c, BIT(27) | BIT(26), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(27) | BIT(26), 0);
 		} else 	if (path == BB_PATH_C) { /* 1-3 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( C ))\n"));
-			odm_set_bb_reg(p_dm, 0x93c, BIT(29) | BIT(28), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(29) | BIT(28), 0);
 
 		} else 	if (path == BB_PATH_D) { /* 1-4 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( D ))\n"));
-			odm_set_bb_reg(p_dm, 0x93c, BIT(31) | BIT(30), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(31) | BIT(30), 0);
 		}
 
 	} else	if (num_enable_path == 2) {
-		odm_set_bb_reg(p_dm, 0x93c, 0xf00000, path);
-		odm_set_bb_reg(p_dm, 0x940, 0xf0, path);
+		odm_set_bb_reg(p_dm, BBREG_0x93c, 0xf00000, path);
+		odm_set_bb_reg(p_dm, BBREG_0x940, 0xf0, path);
 
 		if (path == (BB_PATH_AB)) { /* 2-1 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( A B ))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(25) | BIT(24), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(27) | BIT(26), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(25) | BIT(24), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(27) | BIT(26), 1);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(9) | BIT(8), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(11) | BIT(10), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(9) | BIT(8), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(11) | BIT(10), 1);
 		} else 	if (path == BB_PATH_AC) { /* 2-2 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( A C ))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(25) | BIT(24), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(29) | BIT(28), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(25) | BIT(24), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(29) | BIT(28), 1);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(9) | BIT(8), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(13) | BIT(12), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(9) | BIT(8), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(13) | BIT(12), 1);
 		} else 	if (path == BB_PATH_AD) { /* 2-3 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( A D ))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(25) | BIT(24), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(31) | BIT(30), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(25) | BIT(24), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(31) | BIT(30), 1);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(9) | BIT(8), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(15) | BIT(14), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(9) | BIT(8), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(15) | BIT(14), 1);
 		} else 	if (path == BB_PATH_BC) { /* 2-4 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( B C ))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(27) | BIT(26), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(29) | BIT(28), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(27) | BIT(26), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(29) | BIT(28), 1);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(11) | BIT(10), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(13) | BIT(12), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(11) | BIT(10), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(13) | BIT(12), 1);
 		} else 	if (path == BB_PATH_BD) { /* 2-5 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( B D ))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(27) | BIT(26), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(31) | BIT(30), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(27) | BIT(26), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(31) | BIT(30), 1);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(11) | BIT(10), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(15) | BIT(14), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(11) | BIT(10), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(15) | BIT(14), 1);
 		} else 	if (path == BB_PATH_CD) { /* 2-6 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( C D ))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(29) | BIT(28), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(31) | BIT(30), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(29) | BIT(28), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(31) | BIT(30), 1);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(13) | BIT(12), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(15) | BIT(14), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(13) | BIT(12), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(15) | BIT(14), 1);
 		}
 
 	} else	if (num_enable_path == 3) {
-		odm_set_bb_reg(p_dm, 0x93c, 0xf00000, path);
-		odm_set_bb_reg(p_dm, 0x940, 0xf0, path);
-		odm_set_bb_reg(p_dm, 0x940, 0xf0000, path);
+		odm_set_bb_reg(p_dm, BBREG_0x93c, 0xf00000, path);
+		odm_set_bb_reg(p_dm, BBREG_0x940, 0xf0, path);
+		odm_set_bb_reg(p_dm, BBREG_0x940, 0xf0000, path);
 
 		if (path == BB_PATH_ABC) { /* 3-1 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( A B C))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(25) | BIT(24), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(27) | BIT(26), 1);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(29) | BIT(28), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(25) | BIT(24), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(27) | BIT(26), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(29) | BIT(28), 2);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(9) | BIT(8), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(11) | BIT(10), 1);
-			odm_set_bb_reg(p_dm, 0x940, BIT(13) | BIT(12), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(9) | BIT(8), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(11) | BIT(10), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(13) | BIT(12), 2);
 			/* set for 3ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(21) | BIT(20), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(23) | BIT(22), 1);
-			odm_set_bb_reg(p_dm, 0x940, BIT(25) | BIT(24), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(21) | BIT(20), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(23) | BIT(22), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(25) | BIT(24), 2);
 		} else 	if (path == BB_PATH_ABD) { /* 3-2 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( A B D ))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(25) | BIT(24), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(27) | BIT(26), 1);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(31) | BIT(30), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(25) | BIT(24), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(27) | BIT(26), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(31) | BIT(30), 2);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(9) | BIT(8), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(11) | BIT(10), 1);
-			odm_set_bb_reg(p_dm, 0x940, BIT(15) | BIT(14), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(9) | BIT(8), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(11) | BIT(10), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(15) | BIT(14), 2);
 			/* set for 3ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(21) | BIT(20), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(23) | BIT(22), 1);
-			odm_set_bb_reg(p_dm, 0x940, BIT(27) | BIT(26), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(21) | BIT(20), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(23) | BIT(22), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(27) | BIT(26), 2);
 
 		} else 	if (path == BB_PATH_ACD) { /* 3-3 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( A C D ))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(25) | BIT(24), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(29) | BIT(28), 1);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(31) | BIT(30), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(25) | BIT(24), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(29) | BIT(28), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(31) | BIT(30), 2);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(9) | BIT(8), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(13) | BIT(12), 1);
-			odm_set_bb_reg(p_dm, 0x940, BIT(15) | BIT(14), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(9) | BIT(8), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(13) | BIT(12), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(15) | BIT(14), 2);
 			/* set for 3ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(21) | BIT(20), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(25) | BIT(24), 1);
-			odm_set_bb_reg(p_dm, 0x940, BIT(27) | BIT(26), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(21) | BIT(20), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(25) | BIT(24), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(27) | BIT(26), 2);
 		} else 	if (path == BB_PATH_BCD) { /* 3-4 */
 			PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path (( B C D))\n"));
 			/* set for 1ss */
-			odm_set_bb_reg(p_dm, 0x93c, BIT(27) | BIT(26), 0);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(29) | BIT(28), 1);
-			odm_set_bb_reg(p_dm, 0x93c, BIT(31) | BIT(30), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(27) | BIT(26), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(29) | BIT(28), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x93c, BIT(31) | BIT(30), 2);
 			/* set for 2ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(11) | BIT(10), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(13) | BIT(12), 1);
-			odm_set_bb_reg(p_dm, 0x940, BIT(15) | BIT(14), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(11) | BIT(10), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(13) | BIT(12), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(15) | BIT(14), 2);
 			/* set for 3ss */
-			odm_set_bb_reg(p_dm, 0x940, BIT(23) | BIT(22), 0);
-			odm_set_bb_reg(p_dm, 0x940, BIT(25) | BIT(24), 1);
-			odm_set_bb_reg(p_dm, 0x940, BIT(27) | BIT(26), 2);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(23) | BIT(22), 0);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(25) | BIT(24), 1);
+			odm_set_bb_reg(p_dm, BBREG_0x940, BIT(27) | BIT(26), 2);
 		}
 	} else	if (num_enable_path == 4)
 		PHYDM_DBG(p_dm, DBG_PATH_DIV, (" Turn on path ((A  B C D))\n"));
@@ -395,6 +405,7 @@ phydm_dynamic_tx_path(
 				p_dm_path_div->dtp_check_patha_counter = 0;
 				p_dm_path_div->phydm_dtp_state = PHYDM_DTP_INIT;
 			}
+#if 0
 			/* 2 Search space update */
 			else {
 				/* 1.  find the worst candidate */
@@ -402,6 +413,7 @@ phydm_dynamic_tx_path(
 
 				/* 2. repalce the worst candidate */
 			}
+#endif
 		}
 	}
 
@@ -429,7 +441,7 @@ phydm_dynamic_tx_path_init(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _ODM_PATH_DIVERSITY_		*p_dm_path_div  = &(p_dm->dm_path_div);
+	struct _ODM_PATH_DIVERSITY_		*p_dm_path_div  = &p_dm->dm_path_div;
 	struct _ADAPTER		*p_adapter = p_dm->adapter;
 	u8			search_space_2[NUM_CHOOSE2_FROM4] = {BB_PATH_AB, BB_PATH_AC, BB_PATH_AD, BB_PATH_BC, BB_PATH_BD, BB_PATH_CD };
 	u8			search_space_3[NUM_CHOOSE3_FROM4] = {BB_PATH_BCD, BB_PATH_ACD,  BB_PATH_ABD, BB_PATH_ABC};
@@ -442,8 +454,10 @@ phydm_dynamic_tx_path_init(
 #endif
 	PHYDM_DBG(p_dm, DBG_PATH_DIV, ("Dynamic TX path Init 8814\n"));
 
-	memcpy(&(p_dm_path_div->search_space_2[0]), &(search_space_2[0]), NUM_CHOOSE2_FROM4);
-	memcpy(&(p_dm_path_div->search_space_3[0]), &(search_space_3[0]), NUM_CHOOSE3_FROM4);
+	memcpy(&p_dm_path_div->search_space_2[0], &search_space_2[0],
+	       NUM_CHOOSE2_FROM4);
+	memcpy(&p_dm_path_div->search_space_3[0], &search_space_3[0],
+	       NUM_CHOOSE3_FROM4);
 
 	p_dm_path_div->use_path_a_as_default_ant = 1;
 	p_dm_path_div->phydm_dtp_state = PHYDM_DTP_INIT;
@@ -473,37 +487,37 @@ phydm_process_rssi_for_path_div(
 	struct PHY_DM_STRUCT			*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_phyinfo_struct		*p_phy_info = (struct phydm_phyinfo_struct *)p_phy_info_void;
 	struct phydm_perpkt_info_struct	*p_pktinfo = (struct phydm_perpkt_info_struct *)p_pkt_info_void;
-	struct _ODM_PATH_DIVERSITY_			*p_dm_path_div  = &(p_dm->dm_path_div);
+	struct _ODM_PATH_DIVERSITY_			*p_dm_path_div  = &p_dm->dm_path_div;
 
-	if (p_pktinfo->is_packet_to_self || p_pktinfo->is_packet_match_bssid) {
-		if (p_pktinfo->data_rate > ODM_RATE11M) {
-			if (p_dm_path_div->phydm_path_div_type == PHYDM_4R_PATH_DIV) {
+	if (!(p_pktinfo->is_packet_to_self || p_pktinfo->is_packet_match_bssid))
+		return;
+
+	if (p_pktinfo->data_rate <= ODM_RATE11M)
+		return;
+
+	if (p_dm_path_div->phydm_path_div_type == PHYDM_4R_PATH_DIV) {
 #if RTL8814A_SUPPORT
-				if (p_dm->support_ic_type & ODM_RTL8814A) {
-					p_dm_path_div->path_a_sum_all += p_phy_info->rx_mimo_signal_strength[0];
-					p_dm_path_div->path_a_cnt_all++;
+		if (p_dm->support_ic_type & ODM_RTL8814A) {
+			p_dm_path_div->path_a_sum_all += p_phy_info->rx_mimo_signal_strength[0];
+			p_dm_path_div->path_a_cnt_all++;
 
-					p_dm_path_div->path_b_sum_all += p_phy_info->rx_mimo_signal_strength[1];
-					p_dm_path_div->path_b_cnt_all++;
+			p_dm_path_div->path_b_sum_all += p_phy_info->rx_mimo_signal_strength[1];
+			p_dm_path_div->path_b_cnt_all++;
 
-					p_dm_path_div->path_c_sum_all += p_phy_info->rx_mimo_signal_strength[2];
-					p_dm_path_div->path_c_cnt_all++;
+			p_dm_path_div->path_c_sum_all += p_phy_info->rx_mimo_signal_strength[2];
+			p_dm_path_div->path_c_cnt_all++;
 
-					p_dm_path_div->path_d_sum_all += p_phy_info->rx_mimo_signal_strength[3];
-					p_dm_path_div->path_d_cnt_all++;
-				}
-#endif
-			} else {
-				p_dm_path_div->path_a_sum[p_pktinfo->station_id] += p_phy_info->rx_mimo_signal_strength[0];
-				p_dm_path_div->path_a_cnt[p_pktinfo->station_id]++;
-
-				p_dm_path_div->path_b_sum[p_pktinfo->station_id] += p_phy_info->rx_mimo_signal_strength[1];
-				p_dm_path_div->path_b_cnt[p_pktinfo->station_id]++;
-			}
+			p_dm_path_div->path_d_sum_all += p_phy_info->rx_mimo_signal_strength[3];
+			p_dm_path_div->path_d_cnt_all++;
 		}
+#endif
+	} else {
+		p_dm_path_div->path_a_sum[p_pktinfo->station_id] += p_phy_info->rx_mimo_signal_strength[0];
+		p_dm_path_div->path_a_cnt[p_pktinfo->station_id]++;
+
+		p_dm_path_div->path_b_sum[p_pktinfo->station_id] += p_phy_info->rx_mimo_signal_strength[1];
+		p_dm_path_div->path_b_cnt[p_pktinfo->station_id]++;
 	}
-
-
 }
 
 #endif /* #if RTL8814A_SUPPORT */
@@ -518,7 +532,7 @@ odm_pathdiv_debug(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _ODM_PATH_DIVERSITY_			*p_dm_path_div  = &(p_dm->dm_path_div);
+	struct _ODM_PATH_DIVERSITY_			*p_dm_path_div  = &p_dm->dm_path_div;
 	u32 used = *_used;
 	u32 out_len = *_out_len;
 
@@ -543,16 +557,11 @@ odm_pathdiv_debug(
 
 #endif /*  #if(defined(CONFIG_PATH_DIVERSITY)) */
 
-void
-phydm_c2h_dtp_handler(
-	void	*p_dm_void,
-	u8   *cmd_buf,
-	u8	cmd_len
-)
+void phydm_c2h_dtp_handler(void *p_dm_void, u8 *cmd_buf, u8 cmd_len)
 {
 #if (defined(CONFIG_PATH_DIVERSITY))
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _ODM_PATH_DIVERSITY_		*p_dm_path_div  = &(p_dm->dm_path_div);
+	struct _ODM_PATH_DIVERSITY_		*p_dm_path_div  = &p_dm->dm_path_div;
 
 	u8  macid = cmd_buf[0];
 	u8  target = cmd_buf[1];
@@ -578,10 +587,7 @@ phydm_c2h_dtp_handler(
 #endif
 }
 
-void
-odm_path_diversity(
-	void	*p_dm_void
-)
+void odm_path_diversity(void *p_dm_void)
 {
 #if (defined(CONFIG_PATH_DIVERSITY))
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
@@ -607,17 +613,14 @@ odm_path_diversity(
 #endif
 }
 
-void
-phydm_path_diversity_init(
-	void	*p_dm_void
-)
+void phydm_path_diversity_init(void *p_dm_void)
 {
 #if (defined(CONFIG_PATH_DIVERSITY))
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
 	/*p_dm->support_ability |= ODM_BB_PATH_DIV;*/
 
-	if (*(p_dm->p_mp_mode) == true)
+	if (*p_dm->p_mp_mode == true)
 		return;
 
 	if (!(p_dm->support_ability & ODM_BB_PATH_DIV)) {
@@ -639,8 +642,6 @@ phydm_path_diversity_init(
 		{}
 #endif
 }
-
-
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 /*

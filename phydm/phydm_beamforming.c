@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -24,6 +34,61 @@
 
 #if (BEAMFORMING_SUPPORT == 1)
 
+void
+phydm_get_txbf_device_num(
+	void	*p_dm_void,
+	u8	macid
+)
+{
+#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY)) /*For BDC*/
+#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
+
+	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+	struct cmn_sta_info		*p_sta = p_dm->p_phydm_sta_info[macid];
+	struct bf_cmn_info		*p_bf = NULL;
+	struct _BF_DIV_COEX_		*p_dm_bdc_table = &p_dm->dm_bdc_table;
+	u8	act_as_bfer = 0;
+	u8	act_as_bfee = 0;
+	
+	if (is_sta_active(p_sta)) {
+		p_bf = &(p_sta->bf_info);
+	} else {
+		PHYDM_DBG(p_dm, DBG_TXBF, ("[Warning] %s invalid sta_info\n", __func__));
+		return;
+	}
+
+	 if (p_sta->support_wireless_set & WIRELESS_VHT) {
+		if (p_bf->vht_beamform_cap & BEAMFORMING_VHT_BEAMFORMEE_ENABLE)
+			act_as_bfer = 1;
+
+		if (p_bf->vht_beamform_cap & BEAMFORMING_VHT_BEAMFORMER_ENABLE)
+			act_as_bfee = 1;
+		
+	} else if (p_sta->support_wireless_set & WIRELESS_HT) {
+		if (p_bf->ht_beamform_cap & BEAMFORMING_HT_BEAMFORMEE_ENABLE)
+			act_as_bfer = 1;
+
+		if (p_bf->ht_beamform_cap & BEAMFORMING_HT_BEAMFORMER_ENABLE)
+			act_as_bfee = 1;
+
+	}
+
+	if (act_as_bfer)) { /* Our Device act as BFer */
+		p_dm_bdc_table->w_bfee_client[macid] = true; 
+		p_dm_bdc_table->num_txbfee_client++;
+	} else
+		p_dm_bdc_table->w_bfee_client[macid] = false; 
+	
+	if (act_as_bfee)) { /* Our Device act as BFee */
+		p_dm_bdc_table->w_bfer_client[macid] = true; 
+		p_dm_bdc_table->num_txbfer_client++;
+	} else
+		p_dm_bdc_table->w_bfer_client[macid] = false; 
+
+#endif
+#endif
+}
+
 struct _RT_BEAMFORM_STAINFO *
 phydm_sta_info_init(
 	struct PHY_DM_STRUCT		*p_dm,
@@ -31,7 +96,7 @@ phydm_sta_info_init(
 )
 {
 	struct _RT_BEAMFORMING_INFO		*p_beam_info = &p_dm->beamforming_info;
-	struct _RT_BEAMFORM_STAINFO		*p_entry = &(p_beam_info->beamform_sta_info);
+	struct _RT_BEAMFORM_STAINFO		*p_entry = &p_beam_info->beamform_sta_info;
 	struct sta_info					*p_sta = p_dm->p_odm_sta_info[sta_idx];
 	struct cmn_sta_info				*p_cmn_sta = p_dm->p_phydm_sta_info[sta_idx];
 	struct _ADAPTER					*adapter = p_dm->adapter;
@@ -134,7 +199,7 @@ phydm_beamforming_get_bfee_entry_by_addr(
 	for (i = 0; i < BEAMFORMEE_ENTRY_NUM; i++) {
 		if (p_beam_info->beamformee_entry[i].is_used && (eq_mac_addr(RA, p_beam_info->beamformee_entry[i].mac_addr))) {
 			*idx = i;
-			return &(p_beam_info->beamformee_entry[i]);
+			return &p_beam_info->beamformee_entry[i];
 		}
 	}
 
@@ -155,7 +220,7 @@ phydm_beamforming_get_bfer_entry_by_addr(
 	for (i = 0; i < BEAMFORMER_ENTRY_NUM; i++) {
 		if (p_beam_info->beamformer_entry[i].is_used && (eq_mac_addr(TA, p_beam_info->beamformer_entry[i].mac_addr))) {
 			*idx = i;
-			return &(p_beam_info->beamformer_entry[i]);
+			return &p_beam_info->beamformer_entry[i];
 		}
 	}
 
@@ -177,7 +242,7 @@ phydm_beamforming_get_entry_by_mac_id(
 	for (i = 0; i < BEAMFORMEE_ENTRY_NUM; i++) {
 		if (p_beam_info->beamformee_entry[i].is_used && (mac_id == p_beam_info->beamformee_entry[i].mac_id)) {
 			*idx = i;
-			return &(p_beam_info->beamformee_entry[i]);
+			return &p_beam_info->beamformee_entry[i];
 		}
 	}
 
@@ -220,7 +285,7 @@ phydm_beamforming_get_free_bfee_entry(
 	for (i = 0; i < BEAMFORMEE_ENTRY_NUM; i++) {
 		if (p_beam_info->beamformee_entry[i].is_used == false) {
 			*idx = i;
-			return &(p_beam_info->beamformee_entry[i]);
+			return &p_beam_info->beamformee_entry[i];
 		}
 	}
 	return NULL;
@@ -241,7 +306,7 @@ phydm_beamforming_get_free_bfer_entry(
 	for (i = 0; i < BEAMFORMER_ENTRY_NUM; i++) {
 		if (p_beam_info->beamformer_entry[i].is_used == false) {
 			*idx = i;
-			return &(p_beam_info->beamformer_entry[i]);
+			return &p_beam_info->beamformer_entry[i];
 		}
 	}
 	return NULL;
@@ -307,7 +372,7 @@ beamforming_add_bfee_entry(
 			/*BSSID[44:47] xor BSSID[40:43]*/
 			u16 bssid = ((p_sta->my_mac_addr[5] & 0xf0) >> 4) ^ (p_sta->my_mac_addr[5] & 0xf);
 			/*(dec(A) + dec(B)*32) mod 512*/
-			p_entry->p_aid = (p_sta->aid + bssid * 32) & 0x1ff;
+			p_entry->p_aid = (p_sta->aid + bssid * 32) & BBREG_0x1ff;
 			p_entry->g_id = 63;
 			PHYDM_DBG(p_dm, DBG_TXBF, ("%s: BFee P_AID addressed to STA=%d\n", __func__, p_entry->p_aid));
 		} else if (phydm_acting_determine(p_dm, phydm_acting_as_ibss)) {
@@ -375,7 +440,7 @@ beamforming_add_bfer_entry(
 			/*BSSID[44:47] xor BSSID[40:43]*/
 			u16 bssid = ((p_sta->my_mac_addr[5] & 0xf0) >> 4) ^ (p_sta->my_mac_addr[5] & 0xf);
 
-			p_entry->p_aid = (p_sta->aid + bssid * 32) & 0x1ff;
+			p_entry->p_aid = (p_sta->aid + bssid * 32) & BBREG_0x1ff;
 			p_entry->g_id = 63;
 			/*(dec(A) + dec(B)*32) mod 512*/
 		} else if (phydm_acting_determine(p_dm, phydm_acting_as_ibss)) {
@@ -513,16 +578,16 @@ beamforming_dym_period(
 	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
 	struct _RT_BEAMFORMEE_ENTRY	*p_beamform_entry;
-	struct _RT_BEAMFORMING_INFO	*p_beam_info = &(p_dm->beamforming_info);
-	struct _RT_SOUNDING_INFO		*p_sound_info = &(p_beam_info->sounding_info);
+	struct _RT_BEAMFORMING_INFO	*p_beam_info = &p_dm->beamforming_info;
+	struct _RT_SOUNDING_INFO		*p_sound_info = &p_beam_info->sounding_info;
 
-	struct _RT_BEAMFORMEE_ENTRY	*p_entry = &(p_beam_info->beamformee_entry[p_beam_info->beamformee_cur_idx]);
+	struct _RT_BEAMFORMEE_ENTRY	*p_entry = &p_beam_info->beamformee_entry[p_beam_info->beamformee_cur_idx];
 
 	PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] Start!\n", __func__));
 
 	/* 3 TODO  per-client throughput caculation. */
 
-	if ((*(p_dm->p_current_tx_tp) + *(p_dm->p_current_rx_tp) > 2) && ((p_entry->log_status_fail_cnt <= 20) || status)) {
+	if ((*p_dm->p_current_tx_tp + *p_dm->p_current_rx_tp > 2) && ((p_entry->log_status_fail_cnt <= 20) || status)) {
 		sound_period_sw = 40;	/* 40ms */
 		sound_period_fw = 40;	/* From  H2C cmd, unit = 10ms */
 	} else {
@@ -541,15 +606,16 @@ beamforming_dym_period(
 		}
 
 		PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] period = %d\n", __func__, sound_period_sw));
-		if (p_beamform_entry->beamform_entry_cap & (BEAMFORMER_CAP_HT_EXPLICIT | BEAMFORMER_CAP_VHT_SU)) {
-			if (p_sound_info->sound_mode == SOUNDING_FW_VHT_TIMER || p_sound_info->sound_mode == SOUNDING_FW_HT_TIMER) {
-				if (p_beamform_entry->sound_period != sound_period_fw) {
-					p_beamform_entry->sound_period = sound_period_fw;
-					is_change_period = true;		/*Only FW sounding need to send H2C packet to change sound period. */
-				}
-			} else if (p_beamform_entry->sound_period != sound_period_sw)
-				p_beamform_entry->sound_period = sound_period_sw;
-		}
+		if ((p_beamform_entry->beamform_entry_cap & (BEAMFORMER_CAP_HT_EXPLICIT | BEAMFORMER_CAP_VHT_SU)) == 0)
+			continue;
+
+		if (p_sound_info->sound_mode == SOUNDING_FW_VHT_TIMER || p_sound_info->sound_mode == SOUNDING_FW_HT_TIMER) {
+			if (p_beamform_entry->sound_period != sound_period_fw) {
+				p_beamform_entry->sound_period = sound_period_fw;
+				is_change_period = true;		/*Only FW sounding need to send H2C packet to change sound period. */
+			}
+		} else if (p_beamform_entry->sound_period != sound_period_sw)
+			p_beamform_entry->sound_period = sound_period_sw;
 	}
 
 	if (is_change_period)
@@ -590,12 +656,12 @@ beamforming_send_vht_ndpa_packet(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _RT_BEAMFORMING_INFO	*p_beam_info = &(p_dm->beamforming_info);
+	struct _RT_BEAMFORMING_INFO	*p_beam_info = &p_dm->beamforming_info;
 	boolean					ret = true;
 
 	hal_com_txbf_set(p_dm, TXBF_SET_GET_TX_RATE, NULL);
 
-	if ((p_beam_info->tx_bf_data_rate >= ODM_RATEVHTSS3MCS7) && (p_beam_info->tx_bf_data_rate <= ODM_RATEVHTSS3MCS9) && (p_beam_info->snding3ss == false))
+	if ((p_beam_info->tx_bf_data_rate >= ODM_RATEVHTSS3MCS7) && (p_beam_info->tx_bf_data_rate <= ODM_RATEVHTSS3MCS9) && !p_beam_info->snding3ss)
 		PHYDM_DBG(p_dm, DBG_TXBF, ("@%s: 3SS VHT 789 don't sounding\n", __func__));
 
 	else  {
@@ -630,38 +696,39 @@ phydm_beamfomring_is_sounding(
 	enum beamforming_notify_state	is_sounding = BEAMFORMING_NOTIFY_NONE;
 	struct _RT_BEAMFORMING_OID_INFO	beam_oid_info = p_beam_info->beamforming_oid_info;
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+	u8 i;
 
 	PHYDM_DBG(p_dm, DBG_TXBF, ("%s Start!\n", __func__));
 
 	/*if(( Beamforming_GetBeamCap(p_beam_info) & BEAMFORMER_CAP) == 0)*/
 	/*is_sounding = BEAMFORMING_NOTIFY_RESET;*/
-	if (beam_oid_info.sound_oid_mode == sounding_stop_all_timer)
+	if (beam_oid_info.sound_oid_mode == sounding_stop_all_timer) {
 		is_sounding = BEAMFORMING_NOTIFY_RESET;
-	else {
-		u8 i;
+		goto out;
+	}
 
-		for (i = 0 ; i < BEAMFORMEE_ENTRY_NUM ; i++) {
-			PHYDM_DBG(p_dm, DBG_TXBF, ("@%s: BFee Entry %d is_used=%d, is_sound=%d\n", __func__, i, p_beam_info->beamformee_entry[i].is_used, p_beam_info->beamformee_entry[i].is_sound));
-			if (p_beam_info->beamformee_entry[i].is_used && (!p_beam_info->beamformee_entry[i].is_sound)) {
-				PHYDM_DBG(p_dm, DBG_TXBF, ("%s: Add BFee entry %d\n", __func__, i));
-				*idx = i;
-				if (p_beam_info->beamformee_entry[i].is_mu_sta)
-					is_sounding = BEAMFORMEE_NOTIFY_ADD_MU;
-				else
-					is_sounding = BEAMFORMEE_NOTIFY_ADD_SU;
-			}
+	for (i = 0 ; i < BEAMFORMEE_ENTRY_NUM ; i++) {
+		PHYDM_DBG(p_dm, DBG_TXBF, ("@%s: BFee Entry %d is_used=%d, is_sound=%d\n", __func__, i, p_beam_info->beamformee_entry[i].is_used, p_beam_info->beamformee_entry[i].is_sound));
+		if (p_beam_info->beamformee_entry[i].is_used && (!p_beam_info->beamformee_entry[i].is_sound)) {
+			PHYDM_DBG(p_dm, DBG_TXBF, ("%s: Add BFee entry %d\n", __func__, i));
+			*idx = i;
+			if (p_beam_info->beamformee_entry[i].is_mu_sta)
+				is_sounding = BEAMFORMEE_NOTIFY_ADD_MU;
+			else
+				is_sounding = BEAMFORMEE_NOTIFY_ADD_SU;
+		}
 
-			if ((!p_beam_info->beamformee_entry[i].is_used) && p_beam_info->beamformee_entry[i].is_sound) {
-				PHYDM_DBG(p_dm, DBG_TXBF, ("%s: Delete BFee entry %d\n", __func__, i));
-				*idx = i;
-				if (p_beam_info->beamformee_entry[i].is_mu_sta)
-					is_sounding = BEAMFORMEE_NOTIFY_DELETE_MU;
-				else
-					is_sounding = BEAMFORMEE_NOTIFY_DELETE_SU;
-			}
+		if ((!p_beam_info->beamformee_entry[i].is_used) && p_beam_info->beamformee_entry[i].is_sound) {
+			PHYDM_DBG(p_dm, DBG_TXBF, ("%s: Delete BFee entry %d\n", __func__, i));
+			*idx = i;
+			if (p_beam_info->beamformee_entry[i].is_mu_sta)
+				is_sounding = BEAMFORMEE_NOTIFY_DELETE_MU;
+			else
+				is_sounding = BEAMFORMEE_NOTIFY_DELETE_SU;
 		}
 	}
 
+out:
 	PHYDM_DBG(p_dm, DBG_TXBF, ("%s End, is_sounding = %d\n", __func__, is_sounding));
 	return is_sounding;
 }
@@ -686,7 +753,7 @@ phydm_beamforming_sounding_idx(
 	else {
 		u8	i;
 		for (i = 0; i < BEAMFORMEE_ENTRY_NUM; i++) {
-			if (p_beam_info->beamformee_entry[i].is_used && (false == p_beam_info->beamformee_entry[i].is_sound)) {
+			if (p_beam_info->beamformee_entry[i].is_used && !p_beam_info->beamformee_entry[i].is_sound) {
 				idx = i;
 				break;
 			}
@@ -800,7 +867,7 @@ phydm_beamforming_select_beam_entry(
 	struct _RT_BEAMFORMING_INFO	*p_beam_info
 )
 {
-	struct _RT_SOUNDING_INFO		*p_sound_info = &(p_beam_info->sounding_info);
+	struct _RT_SOUNDING_INFO		*p_sound_info = &p_beam_info->sounding_info;
 	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
 	/*p_entry.is_sound is different between first and latter NDPA, and should not be used as BFee entry selection*/
@@ -832,7 +899,7 @@ phydm_beamforming_start_period(
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	boolean						ret = true;
 	struct _RT_BEAMFORMING_INFO		*p_beam_info = &p_dm->beamforming_info;
-	struct _RT_SOUNDING_INFO			*p_sound_info = &(p_beam_info->sounding_info);
+	struct _RT_SOUNDING_INFO			*p_sound_info = &p_beam_info->sounding_info;
 
 	phydm_beamforming_dym_ndpa_rate(p_dm);
 
@@ -847,14 +914,14 @@ phydm_beamforming_start_period(
 
 		/* HW timer stop: All IC has the same setting */
 		phydm_set_hw_reg_handler_interface(p_dm, HW_VAR_HW_REG_TIMER_STOP, (u8 *)(&timer_type));
-		/* odm_write_1byte(p_dm, 0x15F, 0); */
+		/* odm_write_1byte(p_dm, 0x15f, 0); */
 		/* HW timer init: All IC has the same setting, but 92E & 8812A only write 2 bytes */
 		phydm_set_hw_reg_handler_interface(p_dm, HW_VAR_HW_REG_TIMER_INIT, (u8 *)(&val));
 		/* odm_write_1byte(p_dm, 0x164, 1); */
-		/* odm_write_4byte(p_dm, 0x15C, val); */
+		/* odm_write_4byte(p_dm, 0x15c, val); */
 		/* HW timer start: All IC has the same setting */
 		phydm_set_hw_reg_handler_interface(p_dm, HW_VAR_HW_REG_TIMER_START, (u8 *)(&timer_type));
-		/* odm_write_1byte(p_dm, 0x15F, 0x5); */
+		/* odm_write_1byte(p_dm, 0x15f, 0x5); */
 	} else if (p_sound_info->sound_mode == SOUNDING_FW_VHT_TIMER || p_sound_info->sound_mode == SOUNDING_FW_HT_TIMER)
 		ret = beamforming_start_fw(p_dm, p_sound_info->sound_idx);
 	else
@@ -876,7 +943,7 @@ phydm_beamforming_end_period_sw(
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	/*struct _ADAPTER					*adapter = p_dm->adapter;*/
 	struct _RT_BEAMFORMING_INFO		*p_beam_info = &p_dm->beamforming_info;
-	struct _RT_SOUNDING_INFO			*p_sound_info = &(p_beam_info->sounding_info);
+	struct _RT_SOUNDING_INFO			*p_sound_info = &p_beam_info->sounding_info;
 
 	HAL_HW_TIMER_TYPE timer_type = HAL_TIMER_TXBF;
 
@@ -888,7 +955,7 @@ phydm_beamforming_end_period_sw(
 		p_sound_info->sound_mode == SOUNDING_AUTO_VHT_TIMER || p_sound_info->sound_mode == SOUNDING_AUTO_HT_TIMER)
 		/*HW timer stop: All IC has the same setting*/
 		phydm_set_hw_reg_handler_interface(p_dm, HW_VAR_HW_REG_TIMER_STOP, (u8 *)(&timer_type));
-	/*odm_write_1byte(p_dm, 0x15F, 0);*/
+	/*odm_write_1byte(p_dm, 0x15f, 0);*/
 }
 
 void
@@ -935,34 +1002,36 @@ phydm_beamforming_clear_entry_sw(
 			hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS, (u8 *)&delete_idx);
 		}
 		p_beamform_entry->is_sound = false;
-	} else {
-		for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {
-			p_beamform_entry = p_beam_info->beamformee_entry + idx;
+		return;
+	}
 
-			/*Used after is_sounding=RESET, and will clear the setting of "ever sounded" entry, which is not necessarily be deleted.*/
-			/*This function is mainly used in case "beam_oid_info.sound_oid_mode == sounding_stop_all_timer".*/
-			/*However, setting oid doesn't delete entries (is_used is still true), new entries may fail to be added in.*/
+	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {
+		p_beamform_entry = p_beam_info->beamformee_entry + idx;
 
-			if (p_beamform_entry->is_sound) {
-				PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] SW reset BFee entry %d\n", __func__, idx));
-				/*
-				*	If End procedure is
-				*	1. Between (Send NDPA, C2H packet return), reset state to initialized.
-				*	After C2H packet return , status bit will be set to zero.
-				*
-				*	2. After C2H packet, then reset state to initialized and clear status bit.
-				*/
+		/*Used after is_sounding=RESET, and will clear the setting of "ever sounded" entry, which is not necessarily be deleted.*/
+		/*This function is mainly used in case "beam_oid_info.sound_oid_mode == sounding_stop_all_timer".*/
+		/*However, setting oid doesn't delete entries (is_used is still true), new entries may fail to be added in.*/
 
-				if (p_beamform_entry->beamform_entry_state == BEAMFORMING_ENTRY_STATE_PROGRESSING)
-					phydm_beamforming_end_sw(p_dm, 0);
-				else if (p_beamform_entry->beamform_entry_state == BEAMFORMING_ENTRY_STATE_PROGRESSED) {
-					p_beamform_entry->beamform_entry_state  = BEAMFORMING_ENTRY_STATE_INITIALIZED;
-					hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS, (u8 *)&idx);
-				}
+		if (!p_beamform_entry->is_sound)
+			continue;
 
-				p_beamform_entry->is_sound = false;
-			}
+		PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] SW reset BFee entry %d\n", __func__, idx));
+		/*
+		 *	If End procedure is
+		 *	1. Between (Send NDPA, C2H packet return), reset state to initialized.
+		 *	After C2H packet return , status bit will be set to zero.
+		 *
+		 *	2. After C2H packet, then reset state to initialized and clear status bit.
+		 */
+
+		if (p_beamform_entry->beamform_entry_state == BEAMFORMING_ENTRY_STATE_PROGRESSING)
+			phydm_beamforming_end_sw(p_dm, 0);
+		else if (p_beamform_entry->beamform_entry_state == BEAMFORMING_ENTRY_STATE_PROGRESSED) {
+			p_beamform_entry->beamform_entry_state  = BEAMFORMING_ENTRY_STATE_INITIALIZED;
+			hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS, (u8 *)&idx);
 		}
+
+		p_beamform_entry->is_sound = false;
 	}
 }
 
@@ -1030,7 +1099,7 @@ phydm_beamforming_notify(
 	enum beamforming_notify_state	is_sounding = BEAMFORMING_NOTIFY_NONE;
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _RT_BEAMFORMING_INFO		*p_beam_info = &p_dm->beamforming_info;
-	struct _RT_SOUNDING_INFO			*p_sound_info = &(p_beam_info->sounding_info);
+	struct _RT_SOUNDING_INFO			*p_sound_info = &p_beam_info->sounding_info;
 
 	PHYDM_DBG(p_dm, DBG_TXBF, ("%s Start!\n", __func__));
 
@@ -1127,55 +1196,54 @@ beamforming_init_entry(
 
 	if (p_sta->wireless_mode < WIRELESS_MODE_N_24G)
 		return false;
-	else {
-		if (p_sta->wireless_mode & WIRELESS_MODE_N_5G || p_sta->wireless_mode & WIRELESS_MODE_N_24G) {/*HT*/
-			if (TEST_FLAG(p_sta->cur_beamform, BEAMFORMING_HT_BEAMFORMER_ENABLE)) {/*We are Beamformee because the STA is Beamformer*/
-				beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMEE_CAP_HT_EXPLICIT);
-				num_of_sounding_dim = (p_sta->cur_beamform & BEAMFORMING_HT_BEAMFORMEE_CHNL_EST_CAP) >> 6;
-			}
-			/*We are Beamformer because the STA is Beamformee*/
-			if (TEST_FLAG(p_sta->cur_beamform, BEAMFORMING_HT_BEAMFORMEE_ENABLE) ||
-			    TEST_FLAG(p_sta->ht_beamform_cap, BEAMFORMING_HT_BEAMFORMER_TEST)) {
-				beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMER_CAP_HT_EXPLICIT);
-				comp_steering_num_of_bfer = (p_sta->cur_beamform & BEAMFORMING_HT_BEAMFORMER_STEER_NUM) >> 4;
-			}
-			PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] HT cur_beamform=0x%X, beamform_cap=0x%X\n", __func__, p_sta->cur_beamform, beamform_cap));
-			PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] HT num_of_sounding_dim=%d, comp_steering_num_of_bfer=%d\n", __func__, num_of_sounding_dim, comp_steering_num_of_bfer));
-		}
-#if (ODM_IC_11AC_SERIES_SUPPORT == 1)
-		if (p_sta->wireless_mode & WIRELESS_MODE_AC_5G || p_sta->wireless_mode & WIRELESS_MODE_AC_24G) {	/*VHT*/
 
-			/* We are Beamformee because the STA is SU Beamformer*/
-			if (TEST_FLAG(p_sta->cur_beamform_vht, BEAMFORMING_VHT_BEAMFORMER_ENABLE)) {
-				beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMEE_CAP_VHT_SU);
-				num_of_sounding_dim = (p_sta->cur_beamform_vht & BEAMFORMING_VHT_BEAMFORMEE_SOUND_DIM) >> 12;
-			}
-			/* We are Beamformer because the STA is SU Beamformee*/
-			if (TEST_FLAG(p_sta->cur_beamform_vht, BEAMFORMING_VHT_BEAMFORMEE_ENABLE) ||
-			    TEST_FLAG(p_sta->vht_beamform_cap, BEAMFORMING_VHT_BEAMFORMER_TEST)) {
-				beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMER_CAP_VHT_SU);
-				comp_steering_num_of_bfer = (p_sta->cur_beamform_vht & BEAMFORMING_VHT_BEAMFORMER_STS_CAP) >> 8;
-			}
-			/* We are Beamformee because the STA is MU Beamformer*/
-			if (TEST_FLAG(p_sta->cur_beamform_vht, BEAMFORMING_VHT_MU_MIMO_AP_ENABLE)) {
-				beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMEE_CAP_VHT_MU);
-				num_of_sounding_dim = (p_sta->cur_beamform_vht & BEAMFORMING_VHT_BEAMFORMEE_SOUND_DIM) >> 12;
-			}
-			/* We are Beamformer because the STA is MU Beamformee*/
-			if (phydm_acting_determine(p_dm, phydm_acting_as_ap)) { /* Only AP mode supports to act an MU beamformer */
-				if (TEST_FLAG(p_sta->cur_beamform_vht, BEAMFORMING_VHT_MU_MIMO_STA_ENABLE) ||
-				    TEST_FLAG(p_sta->vht_beamform_cap, BEAMFORMING_VHT_BEAMFORMER_TEST)) {
-					beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMER_CAP_VHT_MU);
-					comp_steering_num_of_bfer = (p_sta->cur_beamform_vht & BEAMFORMING_VHT_BEAMFORMER_STS_CAP) >> 8;
-				}
-			}
-			PHYDM_DBG(p_dm, DBG_TXBF, ("[%s]VHT cur_beamform_vht=0x%X, beamform_cap=0x%X\n", __func__, p_sta->cur_beamform_vht, beamform_cap));
-			PHYDM_DBG(p_dm, DBG_TXBF, ("[%s]VHT num_of_sounding_dim=0x%X, comp_steering_num_of_bfer=0x%X\n", __func__, num_of_sounding_dim, comp_steering_num_of_bfer));
-
+	if (p_sta->wireless_mode & WIRELESS_MODE_N_5G || p_sta->wireless_mode & WIRELESS_MODE_N_24G) {/*HT*/
+		if (TEST_FLAG(p_sta->cur_beamform, BEAMFORMING_HT_BEAMFORMER_ENABLE)) {/*We are Beamformee because the STA is Beamformer*/
+			beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMEE_CAP_HT_EXPLICIT);
+			num_of_sounding_dim = (p_sta->cur_beamform & BEAMFORMING_HT_BEAMFORMEE_CHNL_EST_CAP) >> 6;
 		}
-#endif
+		/*We are Beamformer because the STA is Beamformee*/
+		if (TEST_FLAG(p_sta->cur_beamform, BEAMFORMING_HT_BEAMFORMEE_ENABLE) ||
+				TEST_FLAG(p_sta->ht_beamform_cap, BEAMFORMING_HT_BEAMFORMER_TEST)) {
+			beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMER_CAP_HT_EXPLICIT);
+			comp_steering_num_of_bfer = (p_sta->cur_beamform & BEAMFORMING_HT_BEAMFORMER_STEER_NUM) >> 4;
+		}
+		PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] HT cur_beamform=0x%X, beamform_cap=0x%X\n", __func__, p_sta->cur_beamform, beamform_cap));
+		PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] HT num_of_sounding_dim=%d, comp_steering_num_of_bfer=%d\n", __func__, num_of_sounding_dim, comp_steering_num_of_bfer));
 	}
 
+#if (ODM_IC_11AC_SERIES_SUPPORT == 1)
+	if (p_sta->wireless_mode & WIRELESS_MODE_AC_5G || p_sta->wireless_mode & WIRELESS_MODE_AC_24G) {	/*VHT*/
+
+		/* We are Beamformee because the STA is SU Beamformer*/
+		if (TEST_FLAG(p_sta->cur_beamform_vht, BEAMFORMING_VHT_BEAMFORMER_ENABLE)) {
+			beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMEE_CAP_VHT_SU);
+			num_of_sounding_dim = (p_sta->cur_beamform_vht & BEAMFORMING_VHT_BEAMFORMEE_SOUND_DIM) >> 12;
+		}
+		/* We are Beamformer because the STA is SU Beamformee*/
+		if (TEST_FLAG(p_sta->cur_beamform_vht, BEAMFORMING_VHT_BEAMFORMEE_ENABLE) ||
+				TEST_FLAG(p_sta->vht_beamform_cap, BEAMFORMING_VHT_BEAMFORMER_TEST)) {
+			beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMER_CAP_VHT_SU);
+			comp_steering_num_of_bfer = (p_sta->cur_beamform_vht & BEAMFORMING_VHT_BEAMFORMER_STS_CAP) >> 8;
+		}
+		/* We are Beamformee because the STA is MU Beamformer*/
+		if (TEST_FLAG(p_sta->cur_beamform_vht, BEAMFORMING_VHT_MU_MIMO_AP_ENABLE)) {
+			beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMEE_CAP_VHT_MU);
+			num_of_sounding_dim = (p_sta->cur_beamform_vht & BEAMFORMING_VHT_BEAMFORMEE_SOUND_DIM) >> 12;
+		}
+		/* We are Beamformer because the STA is MU Beamformee*/
+		if (phydm_acting_determine(p_dm, phydm_acting_as_ap)) { /* Only AP mode supports to act an MU beamformer */
+			if (TEST_FLAG(p_sta->cur_beamform_vht, BEAMFORMING_VHT_MU_MIMO_STA_ENABLE) ||
+					TEST_FLAG(p_sta->vht_beamform_cap, BEAMFORMING_VHT_BEAMFORMER_TEST)) {
+				beamform_cap = (enum beamforming_cap)(beamform_cap | BEAMFORMER_CAP_VHT_MU);
+				comp_steering_num_of_bfer = (p_sta->cur_beamform_vht & BEAMFORMING_VHT_BEAMFORMER_STS_CAP) >> 8;
+			}
+		}
+		PHYDM_DBG(p_dm, DBG_TXBF, ("[%s]VHT cur_beamform_vht=0x%X, beamform_cap=0x%X\n", __func__, p_sta->cur_beamform_vht, beamform_cap));
+		PHYDM_DBG(p_dm, DBG_TXBF, ("[%s]VHT num_of_sounding_dim=0x%X, comp_steering_num_of_bfer=0x%X\n", __func__, num_of_sounding_dim, comp_steering_num_of_bfer));
+
+	}
+#endif
 
 	if (beamform_cap == BEAMFORMING_CAP_NONE)
 		return false;
@@ -1287,7 +1355,7 @@ beamforming_start_v1(
 	u8					idx = 0;
 	struct _RT_BEAMFORMEE_ENTRY	*p_entry;
 	boolean					ret = true;
-	struct _RT_BEAMFORMING_INFO	*p_beam_info = &(p_dm->beamforming_info);
+	struct _RT_BEAMFORMING_INFO	*p_beam_info = &p_dm->beamforming_info;
 
 	p_entry = phydm_beamforming_get_bfee_entry_by_addr(p_dm, RA, &idx);
 
@@ -1354,50 +1422,56 @@ beamforming_start_sw(
 	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _RT_BEAMFORMEE_ENTRY	*p_entry;
 	boolean					ret = true;
-	struct _RT_BEAMFORMING_INFO	*p_beam_info = &(p_dm->beamforming_info);
+	struct _RT_BEAMFORMING_INFO	*p_beam_info = &p_dm->beamforming_info;
+#ifdef SUPPORT_MU_BF
+#if (SUPPORT_MU_BF == 1)
+	u8				i, poll_sta_cnt = 0;
+	boolean				is_get_first_bfee = false;
+#endif
+#endif
 
 	if (p_beam_info->is_mu_sounding) {
 		p_beam_info->is_mu_sounding_in_progress = true;
-		p_entry = &(p_beam_info->beamformee_entry[idx]);
+		p_entry = &p_beam_info->beamformee_entry[idx];
 		ra = p_entry->mac_addr;
 
 	} else {
-		p_entry = &(p_beam_info->beamformee_entry[idx]);
+		p_entry = &p_beam_info->beamformee_entry[idx];
 
 		if (p_entry->is_used == false) {
 			PHYDM_DBG(p_dm, DBG_TXBF, ("Skip Beamforming, no entry for idx =%d\n", idx));
 			p_entry->is_beamforming_in_progress = false;
 			return false;
-		} else {
-			if (p_entry->is_beamforming_in_progress) {
-				PHYDM_DBG(p_dm, DBG_TXBF, ("is_beamforming_in_progress, skip...\n"));
-				return false;
-			}
+		}
 
-			p_entry->is_beamforming_in_progress = true;
-			ra = p_entry->mac_addr;
+		if (p_entry->is_beamforming_in_progress) {
+			PHYDM_DBG(p_dm, DBG_TXBF, ("is_beamforming_in_progress, skip...\n"));
+			return false;
+		}
 
-			if (mode == SOUNDING_SW_HT_TIMER || mode == SOUNDING_HW_HT_TIMER || mode == SOUNDING_AUTO_HT_TIMER) {
-				if (!(p_entry->beamform_entry_cap & BEAMFORMER_CAP_HT_EXPLICIT)) {
-					p_entry->is_beamforming_in_progress = false;
-					PHYDM_DBG(p_dm, DBG_TXBF, ("%s Return by not support BEAMFORMER_CAP_HT_EXPLICIT <==\n", __func__));
-					return false;
-				}
-			} else if (mode == SOUNDING_SW_VHT_TIMER || mode == SOUNDING_HW_VHT_TIMER || mode == SOUNDING_AUTO_VHT_TIMER) {
-				if (!(p_entry->beamform_entry_cap & BEAMFORMER_CAP_VHT_SU)) {
-					p_entry->is_beamforming_in_progress = false;
-					PHYDM_DBG(p_dm, DBG_TXBF, ("%s Return by not support BEAMFORMER_CAP_VHT_SU <==\n", __func__));
-					return false;
-				}
-			}
-			if (p_entry->beamform_entry_state != BEAMFORMING_ENTRY_STATE_INITIALIZED && p_entry->beamform_entry_state != BEAMFORMING_ENTRY_STATE_PROGRESSED) {
+		p_entry->is_beamforming_in_progress = true;
+		ra = p_entry->mac_addr;
+
+		if (mode == SOUNDING_SW_HT_TIMER || mode == SOUNDING_HW_HT_TIMER || mode == SOUNDING_AUTO_HT_TIMER) {
+			if (!(p_entry->beamform_entry_cap & BEAMFORMER_CAP_HT_EXPLICIT)) {
 				p_entry->is_beamforming_in_progress = false;
-				PHYDM_DBG(p_dm, DBG_TXBF, ("%s Return by incorrect beamform_entry_state(%d) <==\n", __func__, p_entry->beamform_entry_state));
+				PHYDM_DBG(p_dm, DBG_TXBF, ("%s Return by not support BEAMFORMER_CAP_HT_EXPLICIT <==\n", __func__));
 				return false;
-			} else {
-				p_entry->beamform_entry_state = BEAMFORMING_ENTRY_STATE_PROGRESSING;
-				p_entry->is_sound = true;
 			}
+		} else if (mode == SOUNDING_SW_VHT_TIMER || mode == SOUNDING_HW_VHT_TIMER || mode == SOUNDING_AUTO_VHT_TIMER) {
+			if (!(p_entry->beamform_entry_cap & BEAMFORMER_CAP_VHT_SU)) {
+				p_entry->is_beamforming_in_progress = false;
+				PHYDM_DBG(p_dm, DBG_TXBF, ("%s Return by not support BEAMFORMER_CAP_VHT_SU <==\n", __func__));
+				return false;
+			}
+		}
+		if (p_entry->beamform_entry_state != BEAMFORMING_ENTRY_STATE_INITIALIZED && p_entry->beamform_entry_state != BEAMFORMING_ENTRY_STATE_PROGRESSED) {
+			p_entry->is_beamforming_in_progress = false;
+			PHYDM_DBG(p_dm, DBG_TXBF, ("%s Return by incorrect beamform_entry_state(%d) <==\n", __func__, p_entry->beamform_entry_state));
+			return false;
+		} else {
+			p_entry->beamform_entry_state = BEAMFORMING_ENTRY_STATE_PROGRESSING;
+			p_entry->is_sound = true;
 		}
 
 		p_beam_info->beamformee_cur_idx = idx;
@@ -1423,27 +1497,27 @@ beamforming_start_sw(
 	--------------------------*/
 #ifdef SUPPORT_MU_BF
 #if (SUPPORT_MU_BF == 1)
-	{
-		u8				idx, poll_sta_cnt = 0;
-		boolean				is_get_first_bfee = false;
+	if (p_beam_info->beamformee_mu_cnt <= 1)
+		goto out;
 
-		if (p_beam_info->beamformee_mu_cnt > 1) { /* More than 1 MU STA*/
+	/* More than 1 MU STA*/
+	for (i = 0; i < BEAMFORMEE_ENTRY_NUM; i++) {
+		p_entry = &p_beam_info->beamformee_entry[i];
+		if (!p_entry->is_mu_sta)
+			continue;
 
-			for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {
-				p_entry = &(p_beam_info->beamformee_entry[idx]);
-				if (p_entry->is_mu_sta) {
-					if (is_get_first_bfee) {
-						poll_sta_cnt++;
-						if (poll_sta_cnt == (p_beam_info->beamformee_mu_cnt - 1))/* The last STA*/
-							send_sw_vht_bf_report_poll(p_dm, p_entry->mac_addr, true);
-						else
-							send_sw_vht_bf_report_poll(p_dm, p_entry->mac_addr, false);
-					} else
-						is_get_first_bfee = true;
-				}
-			}
+		if (!is_get_first_bfee) {
+			is_get_first_bfee = true;
+			continue;
 		}
+
+		poll_sta_cnt++;
+		if (poll_sta_cnt == (p_beam_info->beamformee_mu_cnt - 1))/* The last STA*/
+			send_sw_vht_bf_report_poll(p_dm, p_entry->mac_addr, true);
+		else
+			send_sw_vht_bf_report_poll(p_dm, p_entry->mac_addr, false);
 	}
+out:
 #endif
 #endif
 	return true;
@@ -1458,9 +1532,9 @@ beamforming_start_fw(
 {
 	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _RT_BEAMFORMEE_ENTRY	*p_entry;
-	struct _RT_BEAMFORMING_INFO	*p_beam_info = &(p_dm->beamforming_info);
+	struct _RT_BEAMFORMING_INFO	*p_beam_info = &p_dm->beamforming_info;
 
-	p_entry = &(p_beam_info->beamformee_entry[idx]);
+	p_entry = &p_beam_info->beamformee_entry[idx];
 	if (p_entry->is_used == false) {
 		PHYDM_DBG(p_dm, DBG_TXBF, ("Skip Beamforming, no entry for idx =%d\n", idx));
 		return false;
@@ -1481,8 +1555,8 @@ beamforming_check_sounding_success(
 )
 {
 	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _RT_BEAMFORMING_INFO	*p_beam_info = &(p_dm->beamforming_info);
-	struct _RT_BEAMFORMEE_ENTRY	*p_entry = &(p_beam_info->beamformee_entry[p_beam_info->beamformee_cur_idx]);
+	struct _RT_BEAMFORMING_INFO	*p_beam_info = &p_dm->beamforming_info;
+	struct _RT_BEAMFORMEE_ENTRY	*p_entry = &p_beam_info->beamformee_entry[p_beam_info->beamformee_cur_idx];
 
 	PHYDM_DBG(p_dm, DBG_TXBF, ("[David]@%s Start!\n", __func__));
 
@@ -1509,30 +1583,34 @@ phydm_beamforming_end_sw(
 {
 	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _RT_BEAMFORMING_INFO	*p_beam_info = &p_dm->beamforming_info;
-	struct _RT_BEAMFORMEE_ENTRY	*p_entry = &(p_beam_info->beamformee_entry[p_beam_info->beamformee_cur_idx]);
+	struct _RT_BEAMFORMEE_ENTRY	*p_entry = &p_beam_info->beamformee_entry[p_beam_info->beamformee_cur_idx];
 
 	if (p_beam_info->is_mu_sounding) {
 		PHYDM_DBG(p_dm, DBG_TXBF, ("%s: MU sounding done\n", __func__));
 		p_beam_info->is_mu_sounding_in_progress = false;
-		hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS, (u8 *)&(p_beam_info->beamformee_cur_idx));
+		hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS,
+				 (u8 *)&p_beam_info->beamformee_cur_idx);
 	} else {
 		if (p_entry->beamform_entry_state != BEAMFORMING_ENTRY_STATE_PROGRESSING) {
 			PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] BeamformStatus %d\n", __func__, p_entry->beamform_entry_state));
 			return;
 		}
 
-		if ((p_beam_info->tx_bf_data_rate >= ODM_RATEVHTSS3MCS7) && (p_beam_info->tx_bf_data_rate <= ODM_RATEVHTSS3MCS9) && (p_beam_info->snding3ss == false)) {
+		if ((p_beam_info->tx_bf_data_rate >= ODM_RATEVHTSS3MCS7) && (p_beam_info->tx_bf_data_rate <= ODM_RATEVHTSS3MCS9) && !p_beam_info->snding3ss) {
 			PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] VHT3SS 7,8,9, do not apply V matrix.\n", __func__));
 			p_entry->beamform_entry_state = BEAMFORMING_ENTRY_STATE_INITIALIZED;
-			hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS, (u8 *)&(p_beam_info->beamformee_cur_idx));
+			hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS,
+					 (u8 *)&p_beam_info->beamformee_cur_idx);
 		} else if (status == 1) {
 			p_entry->log_status_fail_cnt = 0;
 			p_entry->beamform_entry_state = BEAMFORMING_ENTRY_STATE_PROGRESSED;
-			hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS, (u8 *)&(p_beam_info->beamformee_cur_idx));
+			hal_com_txbf_set(p_dm, TXBF_SET_SOUNDING_STATUS,
+					 (u8 *)&p_beam_info->beamformee_cur_idx);
 		} else {
 			p_entry->log_status_fail_cnt++;
 			p_entry->beamform_entry_state = BEAMFORMING_ENTRY_STATE_INITIALIZED;
-			hal_com_txbf_set(p_dm, TXBF_SET_TX_PATH_RESET, (u8 *)&(p_beam_info->beamformee_cur_idx));
+			hal_com_txbf_set(p_dm, TXBF_SET_TX_PATH_RESET,
+					 (u8 *)&p_beam_info->beamformee_cur_idx);
 			PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] log_status_fail_cnt %d\n", __func__, p_entry->log_status_fail_cnt));
 		}
 
@@ -1612,6 +1690,8 @@ void
 beamforming_sw_timer_callback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	struct timer_list		*p_timer
+#elif (DM_ODM_SUPPORT_TYPE & ODM_CE) && defined(DM_ODM_CE_MAC80211)
+	struct timer_list *t
 #elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	void *function_context
 #endif
@@ -1625,7 +1705,11 @@ beamforming_sw_timer_callback(
 	PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] Start!\n", __func__));
 	beamforming_timer_callback(p_dm);
 #elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
+#if defined(DM_ODM_CE_MAC80211)
+	struct PHY_DM_STRUCT *p_dm = from_timer(PHY_DM_STRUCT, t, beamforming_info.beamforming_timer);
+#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)function_context;
+#endif
 	struct _ADAPTER	*adapter = p_dm->adapter;
 
 	if (adapter->net_closed == true)
@@ -1643,7 +1727,7 @@ phydm_beamforming_init(
 {
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _RT_BEAMFORMING_INFO		*p_beam_info = &p_dm->beamforming_info;
-	struct _RT_BEAMFORMING_OID_INFO	*p_beam_oid_info = &(p_beam_info->beamforming_oid_info);
+	struct _RT_BEAMFORMING_OID_INFO	*p_beam_oid_info = &p_beam_info->beamforming_oid_info;
 	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	struct _ADAPTER		*adapter = p_dm->adapter;
 	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
@@ -1696,7 +1780,7 @@ phydm_acting_determine(
 	else if (type == phydm_acting_as_ibss)
 		ret = ACTING_AS_IBSS(adapter);
 #elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
-	struct mlme_priv			*pmlmepriv = &(adapter->mlmepriv);
+	struct mlme_priv			*pmlmepriv = &adapter->mlmepriv;
 
 	if (type == phydm_acting_as_ap)
 		ret = check_fwstate(pmlmepriv, WIFI_AP_STATE);
@@ -1861,7 +1945,7 @@ phydm_beamforming_control_v2(
 {
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _RT_BEAMFORMING_INFO		*p_beam_info =  &p_dm->beamforming_info;
-	struct _RT_BEAMFORMING_OID_INFO	*p_beam_oid_info = &(p_beam_info->beamforming_oid_info);
+	struct _RT_BEAMFORMING_OID_INFO	*p_beam_oid_info = &p_beam_info->beamforming_oid_info;
 
 	PHYDM_DBG(p_dm, DBG_TXBF, ("%s Start!\n", __func__));
 	PHYDM_DBG(p_dm, DBG_TXBF, ("idx (%d), mode (%d), BW (%d), period (%d)\n", idx, mode, BW, period));
@@ -1943,13 +2027,12 @@ phydm_get_beamform_cap(
 
 
 		for (macid = 0; macid < ODM_ASSOCIATE_ENTRY_NUM; macid++) {
-
 		p_sta = p_dm->p_phydm_sta_info[macid];
 
 		if (!is_sta_active(p_sta))
 			continue;
 
-		p_bf_info = &(p_sta->bf_info);
+		p_bf_info = &p_sta->bf_info;
 		vht_curbeamformcap = p_bf_info->vht_beamform_cap;
 		ht_curbeamformcap  = p_bf_info->ht_beamform_cap;
 

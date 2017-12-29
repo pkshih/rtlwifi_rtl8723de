@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,40 +8,50 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 #ifndef __ODM_TYPES_H__
 #define __ODM_TYPES_H__
 
-
 /*Define Different SW team support*/
-#define	ODM_AP			0x01	/*BIT(0)*/
-#define	ODM_CE			0x04	/*BIT(2)*/
-#define	ODM_WIN		0x08	/*BIT(3)*/
-#define	ODM_ADSL		0x10	/*BIT(4)*/		/*already combine with ODM_AP, and is nouse now*/
-#define	ODM_IOT		0x20	/*BIT(5)*/
+#define ODM_AP 0x01 /*BIT(0)*/
+#define ODM_CE 0x04 /*BIT(2)*/
+#define ODM_WIN 0x08 /*BIT(3)*/
+#define ODM_ADSL 0x10 /*BIT(4)*/ /*already combine with ODM_AP, and is nouse now*/
+#define ODM_IOT 0x20 /*BIT(5)*/
 
 /*For FW API*/
-#define	__iram_odm_func__
+#define __iram_odm_func__
 
 /*Deifne HW endian support*/
-#define	ODM_ENDIAN_BIG	0
-#define	ODM_ENDIAN_LITTLE	1
+#define ODM_ENDIAN_BIG 0
+#define ODM_ENDIAN_LITTLE 1
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->DM_OutSrc)))
+	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&(GET_HAL_DATA(__padapter))->DM_OutSrc))
 #elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
-	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->odmpriv)))
+#define GET_PDM_ODM(__padapter)                                                \
+	((struct PHY_DM_STRUCT *)(&(GET_HAL_DATA(__padapter))->odmpriv))
 #elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&(__padapter->pshare->_dmODM)))
+	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&__padapter->pshare->_dmODM))
 #endif
 
 #if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
-	#define	RT_PCI_INTERFACE				1
-	#define	RT_USB_INTERFACE				2
-	#define	RT_SDIO_INTERFACE				3
+#define RT_PCI_INTERFACE 1
+#define RT_USB_INTERFACE 2
+#define RT_SDIO_INTERFACE 3
 #endif
 
 enum hal_status {
@@ -57,7 +67,7 @@ enum hal_status {
 
 #if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
 
-#define		VISTA_USB_RX_REVISE			0
+#define VISTA_USB_RX_REVISE 0
 
 /*
  * Declare for ODM spin lock defintion temporarily fro compile pass.
@@ -73,7 +83,8 @@ enum rt_spinlock_type {
 	RT_CHNLOP_SPINLOCK = 9,
 	RT_RF_OPERATE_SPINLOCK = 10,
 	RT_INITIAL_SPINLOCK = 11,
-	RT_RF_STATE_SPINLOCK = 12, /* For RF state. Added by Bruce, 2007-10-30. */
+	RT_RF_STATE_SPINLOCK =
+		12, /* For RF state. Added by Bruce, 2007-10-30. */
 #if VISTA_USB_RX_REVISE
 	RT_USBRX_CONTEXT_SPINLOCK = 13,
 	RT_USBRX_POSTPROC_SPINLOCK = 14, /* protect data of adapter->IndicateW/ IndicateR */
@@ -98,12 +109,12 @@ enum rt_spinlock_type {
 	RT_FW_PS_SPINLOCK = 33,
 	RT_HW_TIMER_SPIN_LOCK = 34,
 	RT_MPT_WI_SPINLOCK = 35,
-	RT_P2P_SPIN_LOCK = 36,	/* Protect P2P context */
+	RT_P2P_SPIN_LOCK = 36, /* Protect P2P context */
 	RT_DBG_SPIN_LOCK = 37,
 	RT_IQK_SPINLOCK = 38,
 	RT_PENDED_OID_SPINLOCK = 39,
 	RT_CHNLLIST_SPINLOCK = 40,
-	RT_INDIC_SPINLOCK = 41,	/* protect indication */
+	RT_INDIC_SPINLOCK = 41, /* protect indication */
 	RT_RFD_SPINLOCK = 42,
 	RT_SYNC_IO_CNT_SPINLOCK = 43,
 	RT_LAST_SPINLOCK,
@@ -152,55 +163,57 @@ enum rt_spinlock_type {
 
 #elif (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
 
-	#include <asm/byteorder.h>
+#include <asm/byteorder.h>
 
-	#define DEV_BUS_TYPE	RT_PCI_INTERFACE
+#define DEV_BUS_TYPE RT_PCI_INTERFACE
 
-	#if defined(__LITTLE_ENDIAN)
-		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_LITTLE
-	#elif defined(__BIG_ENDIAN)
-		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_BIG
-	#else
-		#error
-	#endif
+#if defined(__LITTLE_ENDIAN)
+#define ODM_ENDIAN_TYPE ODM_ENDIAN_LITTLE
+#elif defined(__BIG_ENDIAN)
+#define ODM_ENDIAN_TYPE ODM_ENDIAN_BIG
+#else
+#error
+#endif
 
-	/* define useless flag to avoid compile warning */
-	#define	USE_WORKITEM 0
-	#define	FOR_BRAZIL_PRETEST 0
-	#define	FPGA_TWO_MAC_VERIFICATION	0
-	#define	RTL8881A_SUPPORT	0
-	#define	PHYDM_TESTCHIP_SUPPORT 0
+/* define useless flag to avoid compile warning */
+#define USE_WORKITEM 0
+#define FOR_BRAZIL_PRETEST 0
+#define FPGA_TWO_MAC_VERIFICATION 0
+#define RTL8881A_SUPPORT 0
+#define PHYDM_TESTCHIP_SUPPORT 0
 
-	/* support list */
-	#define RTL8188E_SUPPORT				0
-	#define RTL8812A_SUPPORT				0
-	#define RTL8821A_SUPPORT				0
-	#define RTL8723B_SUPPORT				0
-	#define RTL8723D_SUPPORT				0
-	#define RTL8192E_SUPPORT				0
-	#define RTL8814A_SUPPORT				0
-	#define RTL8195A_SUPPORT				0
-	#define RTL8197F_SUPPORT				0
-	#define RTL8703B_SUPPORT				0
-	#define RTL8188F_SUPPORT				0
-	#define RTL8822B_SUPPORT				1
-	#define RTL8821B_SUPPORT				0
-	#define RTL8821C_SUPPORT				0
+/* support list */
+#define RTL8188E_SUPPORT 0
+#define RTL8812A_SUPPORT 0
+#define RTL8821A_SUPPORT 0
+#define RTL8723B_SUPPORT 0
+#define RTL8723D_SUPPORT 0
+#define RTL8192E_SUPPORT 0
+#define RTL8814A_SUPPORT 0
+#define RTL8195A_SUPPORT 0
+#define RTL8197F_SUPPORT 0
+#define RTL8703B_SUPPORT 0
+#define RTL8188F_SUPPORT 0
+#define RTL8822B_SUPPORT 1
+#define RTL8821B_SUPPORT 0
+#define RTL8821C_SUPPORT 0
 
-	#define RATE_ADAPTIVE_SUPPORT			0
-	#define POWER_TRAINING_ACTIVE			0
+#define RATE_ADAPTIVE_SUPPORT 0
+#define POWER_TRAINING_ACTIVE 0
 
-	#define sta_info	rtl_sta_info
-	#define	boolean		bool
+#define sta_info rtl_sta_info
+#define boolean bool
 
-	#define _FAIL		0
-	#define _SUCCESS	1
+#define _FAIL 0
+#define _SUCCESS 1
 
-	#define IS_MCAST(x)	(is_multicast_ether_addr(x) || is_broadcast_ether_addr(x))
-	#define rtw_warn_on(condition) WARN_ON(condition)
+#define IS_MCAST(x) (is_multicast_ether_addr(x) || is_broadcast_ether_addr(x))
+#define rtw_warn_on(condition) WARN_ON(condition)
 
-	#define MAC_FMT "%02x:%02x:%02x:%02x:%02x:%02x"
-	#define MAC_ARG(x) ((u8 *)(x))[0], ((u8 *)(x))[1], ((u8 *)(x))[2], ((u8 *)(x))[3], ((u8 *)(x))[4], ((u8 *)(x))[5]
+#define MAC_FMT "%02x:%02x:%02x:%02x:%02x:%02x"
+#define MAC_ARG(x)                                                             \
+	((u8 *)(x))[0], ((u8 *)(x))[1], ((u8 *)(x))[2], ((u8 *)(x))[3],        \
+		((u8 *)(x))[4], ((u8 *)(x))[5]
 
 #elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	#include <drv_types.h>
@@ -241,29 +254,36 @@ enum rt_spinlock_type {
 	#endif
 #endif
 
-#define READ_NEXT_PAIR(v1, v2, i) do { if (i+2 >= array_len) break; i += 2; v1 = array[i]; v2 = array[i+1]; } while (0)
-#define COND_ELSE  2
+#define READ_NEXT_PAIR(v1, v2, i)                                              \
+	do {                                                                   \
+		if (i + 2 >= array_len)                                        \
+			break;                                                 \
+		i += 2;                                                        \
+		v1 = array[i];                                                 \
+		v2 = array[i + 1];                                             \
+	} while (0)
+#define COND_ELSE 2
 #define COND_ENDIF 3
 
-#define	MASKBYTE0		0xff
-#define	MASKBYTE1		0xff00
-#define	MASKBYTE2		0xff0000
-#define	MASKBYTE3		0xff000000
-#define	MASKHWORD		0xffff0000
-#define	MASKLWORD		0x0000ffff
-#define	MASKDWORD		0xffffffff
-#define	MASK7BITS		0x7f
-#define	MASK12BITS		0xfff
-#define	MASKH4BITS		0xf0000000
-#define	MASK20BITS		0xfffff
-#define	MASKOFDM_D		0xffc00000
-#define	MASKCCK			0x3f3f3f3f
-#define RFREGOFFSETMASK	0xfffff
-#define MASKH3BYTES		0xffffff00
-#define MASKL3BYTES		0x00ffffff
-#define MASKBYTE2HIGHNIBBLE		0x00f00000
-#define MASKBYTE3LOWNIBBLE		0x0f000000
-#define	MASKL3BYTES			0x00ffffff
-#define RFREGOFFSETMASK	0xfffff
+#define MASKBYTE0 0xff
+#define MASKBYTE1 0xff00
+#define MASKBYTE2 0xff0000
+#define MASKBYTE3 0xff000000
+#define MASKHWORD 0xffff0000
+#define MASKLWORD 0x0000ffff
+#define MASKDWORD 0xffffffff
+#define MASK7BITS 0x7f
+#define MASK12BITS 0xfff
+#define MASKH4BITS 0xf0000000
+#define MASK20BITS 0xfffff
+#define MASKOFDM_D 0xffc00000
+#define MASKCCK 0x3f3f3f3f
+#define RFREGOFFSETMASK 0xfffff
+#define MASKH3BYTES 0xffffff00
+#define MASKL3BYTES 0x00ffffff
+#define MASKBYTE2HIGHNIBBLE 0x00f00000
+#define MASKBYTE3LOWNIBBLE 0x0f000000
+#define MASKL3BYTES 0x00ffffff
+#define RFREGOFFSETMASK 0xfffff
 
 #endif /* __ODM_TYPES_H__ */

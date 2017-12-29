@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,12 +8,22 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
-#ifndef	__ODM_PRECOMP_H__
+#ifndef __ODM_PRECOMP_H__
 #define __ODM_PRECOMP_H__
 
 #include "phydm_types.h"
@@ -23,7 +33,7 @@
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	#include "Precomp.h"		/* We need to include mp_precomp.h due to batch file setting. */
 #else
-	#define		TEST_FALG___		1
+#define TEST_FALG___ 1
 #endif
 
 /* 2 Config Flags and Structs - defined by each ODM type */
@@ -45,11 +55,11 @@
 
 #elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	#ifdef DM_ODM_CE_MAC80211
-		#include "../wifi.h"
-		#include "rtl_phydm.h"
+#include "../wifi.h"
+#include "rtl_phydm.h"
 	#endif
-	#define __PACK
-	#define __WLAN_ATTRIB_PACK__
+#define __PACK
+#define __WLAN_ATTRIB_PACK__
 #elif (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	#include "mp_precomp.h"
 	#define	ODM_ENDIAN_TYPE				ODM_ENDIAN_LITTLE
@@ -110,7 +120,7 @@ rtw_phydm_cfg_phy_para(
 
 /* JJ ADD 20161014 */
 #if (DM_ODM_SUPPORT_TYPE & (ODM_CE|ODM_AP|ODM_IOT))
-#define RTL8710B_SUPPORT		0
+#define RTL8710B_SUPPORT 0
 #endif
 
 #if RTL8188E_SUPPORT == 1
@@ -268,43 +278,41 @@ rtw_phydm_cfg_phy_para(
 #if (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
 #include "../halmac/halmac_reg2.h"
 
-#define	LDPC_HT_ENABLE_RX			BIT(0)
-#define	LDPC_HT_ENABLE_TX			BIT(1)
-#define	LDPC_HT_TEST_TX_ENABLE			BIT(2)
-#define	LDPC_HT_CAP_TX				BIT(3)
+#define LDPC_HT_ENABLE_RX BIT(0)
+#define LDPC_HT_ENABLE_TX BIT(1)
+#define LDPC_HT_TEST_TX_ENABLE BIT(2)
+#define LDPC_HT_CAP_TX BIT(3)
 
-#define	STBC_HT_ENABLE_RX			BIT(0)
-#define	STBC_HT_ENABLE_TX			BIT(1)
-#define	STBC_HT_TEST_TX_ENABLE			BIT(2)
-#define	STBC_HT_CAP_TX				BIT(3)
+#define STBC_HT_ENABLE_RX BIT(0)
+#define STBC_HT_ENABLE_TX BIT(1)
+#define STBC_HT_TEST_TX_ENABLE BIT(2)
+#define STBC_HT_CAP_TX BIT(3)
 
+#define LDPC_VHT_ENABLE_RX BIT(0)
+#define LDPC_VHT_ENABLE_TX BIT(1)
+#define LDPC_VHT_TEST_TX_ENABLE BIT(2)
+#define LDPC_VHT_CAP_TX BIT(3)
 
-#define	LDPC_VHT_ENABLE_RX			BIT(0)
-#define	LDPC_VHT_ENABLE_TX			BIT(1)
-#define	LDPC_VHT_TEST_TX_ENABLE			BIT(2)
-#define	LDPC_VHT_CAP_TX				BIT(3)
-
-#define	STBC_VHT_ENABLE_RX			BIT(0)
-#define	STBC_VHT_ENABLE_TX			BIT(1)
-#define	STBC_VHT_TEST_TX_ENABLE			BIT(2)
-#define	STBC_VHT_CAP_TX				BIT(3)
+#define STBC_VHT_ENABLE_RX BIT(0)
+#define STBC_VHT_ENABLE_TX BIT(1)
+#define STBC_VHT_TEST_TX_ENABLE BIT(2)
+#define STBC_VHT_CAP_TX BIT(3)
 #endif
 
-
 #if (RTL8822B_SUPPORT == 1)
-	#include "rtl8822b/halhwimg8822b_mac.h"
-	#include "rtl8822b/halhwimg8822b_rf.h"
-	#include "rtl8822b/halhwimg8822b_bb.h"
-	#include "rtl8822b/phydm_regconfig8822b.h"
-	#include "halrf/rtl8822b/halrf_8822b.h"
-	#include "rtl8822b/phydm_rtl8822b.h"
-	#include "rtl8822b/phydm_hal_api8822b.h"
-	#include "rtl8822b/version_rtl8822b.h"
+#include "rtl8822b/halhwimg8822b_mac.h"
+#include "rtl8822b/halhwimg8822b_rf.h"
+#include "rtl8822b/halhwimg8822b_bb.h"
+#include "rtl8822b/phydm_regconfig8822b.h"
+#include "halrf/rtl8822b/halrf_8822b.h"
+#include "rtl8822b/phydm_rtl8822b.h"
+#include "rtl8822b/phydm_hal_api8822b.h"
+#include "rtl8822b/version_rtl8822b.h"
 
 	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 		#ifdef DM_ODM_CE_MAC80211
-			#include "../halmac/halmac_reg_8822b.h"
+#include "../halmac/halmac_reg_8822b.h"
 		#else
 			#include <hal_data.h>		/* struct HAL_DATA_TYPE */
 			#include <rtl8822b_hal.h>	/* RX_SMOOTH_FACTOR, reg definition and etc.*/

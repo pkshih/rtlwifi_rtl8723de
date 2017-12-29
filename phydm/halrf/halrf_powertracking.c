@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -19,18 +29,14 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-
-boolean
-odm_check_power_status(
-	void		*p_dm_void
-)
+boolean odm_check_power_status(void *p_dm_void)
 {
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _ADAPTER		*p_adapter = p_dm->adapter;
 
 	RT_RF_POWER_STATE	rt_state;
-	PMGNT_INFO			p_mgnt_info	= &(p_adapter->MgntInfo);
+	PMGNT_INFO			p_mgnt_info	= &p_adapter->MgntInfo;
 
 	/* 2011/07/27 MH We are not testing ready~~!! We may fail to get correct value when init sequence. */
 	if (p_mgnt_info->init_adpt_in_progress == true) {
@@ -48,23 +54,19 @@ odm_check_power_status(
 		return	false;
 	}
 #endif
-	return	true;
-	
+	return true;
 }
 
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-void
-halrf_update_pwr_track(
-	void		*p_dm_void,
-	u8		rate
-)
+void halrf_update_pwr_track(void *p_dm_void, u8 rate)
 {
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	u8			path_idx = 0;
 #endif
 
-	ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("Pwr Track Get rate=0x%x\n", rate));
+	ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
+		     ("Pwr Track Get rate=0x%x\n", rate));
 
 	p_dm->tx_rate = rate;
 
@@ -103,12 +105,9 @@ halrf_update_pwr_track(
 	odm_schedule_work_item(&p_dm->ra_rpt_workitem);
 #endif
 #endif
-
 }
 
 #endif
-
-
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 void
@@ -144,6 +143,4 @@ halrf_update_init_rate_work_item_callback(
 	}
 }
 #endif
-
-
 

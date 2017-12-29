@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -21,28 +31,21 @@
 #include "phydm_precomp.h"
 
 const u16 db_invert_table[12][8] = {
-	{	1,		1,		1,		2,		2,		2,		2,		3},
-	{	3,		3,		4,		4,		4,		5,		6,		6},
-	{	7,		8,		9,		10,		11,		13,		14,		16},
-	{	18,		20,		22,		25,		28,		32,		35,		40},
-	{	45,		50,		56,		63,		71,		79,		89,		100},
-	{	112,		126,		141,		158,		178,		200,		224,		251},
-	{	282,		316,		355,		398,		447,		501,		562,		631},
-	{	708,		794,		891,		1000,	1122,	1259,	1413,	1585},
-	{	1778,	1995,	2239,	2512,	2818,	3162,	3548,	3981},
-	{	4467,	5012,	5623,	6310,	7079,	7943,	8913,	10000},
-	{	11220,	12589,	14125,	15849,	17783,	19953,	22387,	25119},
-	{	28184,	31623,	35481,	39811,	44668,	50119,	56234,	65535}
-};
-
+	{1, 1, 1, 2, 2, 2, 2, 3},
+	{3, 3, 4, 4, 4, 5, 6, 6},
+	{7, 8, 9, 10, 11, 13, 14, 16},
+	{18, 20, 22, 25, 28, 32, 35, 40},
+	{45, 50, 56, 63, 71, 79, 89, 100},
+	{112, 126, 141, 158, 178, 200, 224, 251},
+	{282, 316, 355, 398, 447, 501, 562, 631},
+	{708, 794, 891, 1000, 1122, 1259, 1413, 1585},
+	{1778, 1995, 2239, 2512, 2818, 3162, 3548, 3981},
+	{4467, 5012, 5623, 6310, 7079, 7943, 8913, 10000},
+	{11220, 12589, 14125, 15849, 17783, 19953, 22387, 25119},
+	{28184, 31623, 35481, 39811, 44668, 50119, 56234, 65535}};
 
 /*Y = 10*log(X)*/
-s32
-odm_pwdb_conversion(
-	s32 X,
-	u32 total_bit,
-	u32 decimal_bit
-)
+s32 odm_pwdb_conversion(s32 X, u32 total_bit, u32 decimal_bit)
 {
 	s32 Y, integer = 0, decimal = 0;
 	u32 i;
@@ -54,7 +57,10 @@ odm_pwdb_conversion(
 		if (X & BIT(i)) {
 			integer = i;
 			if (i > 0)
-				decimal = (X & BIT(i - 1)) ? 2 : 0; /* decimal is 0.5dB*3=1.5dB~=2dB */
+				decimal =
+					(X & BIT(i - 1)) ?
+						2 :
+						0; /* decimal is 0.5dB*3=1.5dB~=2dB */
 			break;
 		}
 	}
@@ -64,30 +70,20 @@ odm_pwdb_conversion(
 	return Y;
 }
 
-s32
-odm_sign_conversion(
-	s32 value,
-	u32 total_bit
-)
+s32 odm_sign_conversion(s32 value, u32 total_bit)
 {
 	if (value & BIT(total_bit - 1))
 		value -= BIT(total_bit);
-	
+
 	return value;
 }
 
-void
-phydm_seq_sorting(
-	void	*p_dm_void,
-	u32	*p_value,
-	u32	*rank_idx,
-	u32	*p_idx_out,
-	u8	seq_length
-)
+void phydm_seq_sorting(void *p_dm_void, u32 *p_value, u32 *rank_idx,
+		       u32 *p_idx_out, u8 seq_length)
 {
-	u8		i = 0, j = 0;
-	u32		tmp_a, tmp_b;
-	u32		tmp_idx_a, tmp_idx_b;
+	u8 i = 0, j = 0;
+	u32 tmp_a, tmp_b;
+	u32 tmp_idx_a, tmp_idx_b;
 
 	for (i = 0; i < seq_length; i++) {
 		rank_idx[i] = i;
@@ -95,9 +91,7 @@ phydm_seq_sorting(
 	}
 
 	for (i = 0; i < (seq_length - 1); i++) {
-
 		for (j = 0; j < (seq_length - 1 - i); j++) {
-
 			tmp_a = p_value[j];
 			tmp_b = p_value[j + 1];
 
@@ -120,9 +114,7 @@ phydm_seq_sorting(
 	}
 }
 
-u32
-odm_convert_to_db(
-	u32	value)
+u32 odm_convert_to_db(u32 value)
 {
 	u8 i;
 	u8 j;
@@ -136,7 +128,7 @@ odm_convert_to_db(
 	}
 
 	if (i >= 12) {
-		return 96;	/* maximum 96 dB */
+		return 96; /* maximum 96 dB */
 	}
 
 	for (j = 0; j < 8; j++) {
@@ -149,9 +141,7 @@ odm_convert_to_db(
 	return dB;
 }
 
-u32
-odm_convert_to_linear(
-	u32	value)
+u32 odm_convert_to_linear(u32 value)
 {
 	u8 i;
 	u8 j;

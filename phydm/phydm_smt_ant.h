@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,21 +8,31 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
-#ifndef	__PHYDMSMTANT_H__
-#define    __PHYDMSMTANT_H__
+#ifndef __PHYDMSMTANT_H__
+#define __PHYDMSMTANT_H__
 
 /*#define SMT_ANT_VERSION	"1.1"*/ /*2017.03.13*/
 /*#define SMT_ANT_VERSION	"1.2"*/ /*2017.03.28*/
-#define SMT_ANT_VERSION	"2.0" /* Add Cumitek SmtAnt 2017.05.25*/
+#define SMT_ANT_VERSION "2.0" /* Add Cumitek SmtAnt 2017.05.25*/
 
-#define	SMTANT_RTK		1
-#define	SMTANT_HON_BO	2
-#define	SMTANT_CUMITEK	3
+#define SMTANT_RTK 1
+#define SMTANT_HON_BO 2
+#define SMTANT_CUMITEK 3
 
 #if (defined(CONFIG_SMART_ANTENNA))
 
@@ -231,9 +241,6 @@ phydm_hl_smart_ant_debug(
 #endif/*#if (defined(CONFIG_HL_SMART_ANTENNA))*/
 #endif/*#if (defined(CONFIG_SMART_ANTENNA))*/
 
-void
-phydm_smt_ant_init(
-	void		*p_dm_void
-);
+void phydm_smt_ant_init(void *p_dm_void);
 
 #endif

@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2016 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 #ifndef __HAL_TXBF_JAGUAR_H__
@@ -76,13 +86,13 @@ hal_txbf_jaguar_clk_8812a(
 #endif
 #else
 
-#define hal_txbf_8812a_set_ndpa_rate(p_dm_void,	BW,	rate)
+#define hal_txbf_8812a_set_ndpa_rate(p_dm_void, BW, rate)
 #define hal_txbf_jaguar_enter(p_dm_void, idx)
 #define hal_txbf_jaguar_leave(p_dm_void, idx)
 #define hal_txbf_jaguar_status(p_dm_void, idx)
-#define hal_txbf_jaguar_fw_txbf(p_dm_void,	idx)
+#define hal_txbf_jaguar_fw_txbf(p_dm_void, idx)
 #define hal_txbf_jaguar_patch(p_dm_void, operation)
 #define hal_txbf_jaguar_clk_8812a(p_dm_void)
 #endif
 
-#endif	/*  #ifndef __HAL_TXBF_JAGUAR_H__ */
+#endif /*  #ifndef __HAL_TXBF_JAGUAR_H__ */

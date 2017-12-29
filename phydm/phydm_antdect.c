@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -98,7 +108,7 @@ odm_single_dual_antenna_detection(
 	/* 1 Backup Current RF/BB Settings */
 
 	current_channel = odm_get_rf_reg(p_dm, RF_PATH_A, ODM_CHANNEL, RFREGOFFSETMASK);
-	rf_loop_reg = odm_get_rf_reg(p_dm, RF_PATH_A, 0x00, RFREGOFFSETMASK);
+	rf_loop_reg = odm_get_rf_reg(p_dm, RF_PATH_A, RFREG_0x00, RFREGOFFSETMASK);
 	if (p_dm->support_ic_type & ODM_RTL8723B) {
 		reg92c = odm_get_bb_reg(p_dm, REG_DPDT_CONTROL, MASKDWORD);
 		reg930 = odm_get_bb_reg(p_dm, rfe_ctrl_anta_src, MASKDWORD);
@@ -210,7 +220,7 @@ odm_single_dual_antenna_detection(
 	odm_set_bb_reg(p_dm, REG_OFDM_0_XA_AGC_CORE1, 0x7F, 0x40);
 	odm_set_bb_reg(p_dm, REG_OFDM_0_XA_AGC_CORE1, MASKDWORD, regc50);
 	odm_set_rf_reg(p_dm, RF_PATH_A, RF_CHNLBW, RFREGOFFSETMASK, current_channel);
-	odm_set_rf_reg(p_dm, RF_PATH_A, 0x00, RFREGOFFSETMASK, rf_loop_reg);
+	odm_set_rf_reg(p_dm, RF_PATH_A, RFREG_0x00, RFREGOFFSETMASK, rf_loop_reg);
 
 	/* Reload AFE Registers */
 	if (p_dm->support_ic_type & ODM_RTL8723B)
@@ -265,7 +275,6 @@ odm_sw_ant_div_check_before_link(
 	void		*p_dm_void
 )
 {
-
 #if (RT_MEM_SIZE_LEVEL != RT_MEM_SIZE_MINIMUM)
 
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
@@ -367,7 +376,7 @@ odm_sw_ant_div_check_before_link(
 
 			tmp_swas_no_link_bk_reg948 = odm_read_4byte(p_dm, REG_S0_S1_PATH_SWITCH);
 
-			if ((p_dm_swat_table->cur_antenna == MAIN_ANT) && (tmp_swas_no_link_bk_reg948 == 0x200)) {
+			if ((p_dm_swat_table->cur_antenna == MAIN_ANT) && (tmp_swas_no_link_bk_reg948 == BBREG_0x200)) {
 				odm_set_bb_reg(p_dm, REG_S0_S1_PATH_SWITCH, 0xfff, 0x280);
 				odm_set_bb_reg(p_dm, REG_AGC_TABLE_SELECT, BIT(31), 0x1);
 				p_dm_swat_table->cur_antenna = AUX_ANT;
@@ -392,8 +401,8 @@ odm_sw_ant_div_check_before_link(
 		PHYDM_DBG(p_dm, DBG_ANT_DIV, (" tmp_num_bss_desc= (( %d ))\n", p_mgnt_info->tmpNumBssDesc)); /* debug for Dino */
 
 		for (index = 0; index < p_mgnt_info->tmpNumBssDesc; index++) {
-			p_tmp_bss_desc = &(p_mgnt_info->tmpbssDesc[index]); /* Antenna 1 */
-			p_test_bss_desc = &(p_mgnt_info->bssDesc[index]); /* Antenna 2 */
+			p_tmp_bss_desc = &p_mgnt_info->tmpbssDesc[index]; /* Antenna 1 */
+			p_test_bss_desc = &p_mgnt_info->bssDesc[index]; /* Antenna 2 */
 
 			if (PlatformCompareMemory(p_test_bss_desc->bdBssIdBuf, p_tmp_bss_desc->bdBssIdBuf, 6) != 0) {
 				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("odm_sw_ant_div_check_before_link(): ERROR!! This shall not happen.\n"));
@@ -646,17 +655,17 @@ odm_single_dual_antenna_detection_psd(
 	reg948 = odm_get_bb_reg(p_dm, REG_S0_S1_PATH_SWITCH, MASKDWORD);
 	regb2c =  odm_get_bb_reg(p_dm, REG_AGC_TABLE_SELECT, MASKDWORD);
 	regc50 = odm_get_bb_reg(p_dm, REG_OFDM_0_XA_AGC_CORE1, MASKDWORD);
-	regc14 = odm_get_bb_reg(p_dm, 0xc14, MASKDWORD);
-	reg908 = odm_get_bb_reg(p_dm, 0x908, MASKDWORD);
+	regc14 = odm_get_bb_reg(p_dm, BBREG_0xc14, MASKDWORD);
+	reg908 = odm_get_bb_reg(p_dm, BBREG_0x908, MASKDWORD);
 
 	/* 2 [ setting for doing PSD function (CH4)] */
 	odm_set_bb_reg(p_dm, REG_FPGA0_RFMOD, BIT(24), 0); /* disable whole CCK block */
 	odm_write_1byte(p_dm, REG_TXPAUSE, 0xFF); /* Turn off TX  ->  Pause TX Queue */
-	odm_set_bb_reg(p_dm, 0xC14, MASKDWORD, 0x0); /* [ Set IQK Matrix = 0 ] equivalent to [ Turn off CCA] */
+	odm_set_bb_reg(p_dm, BBREG_0xc14, MASKDWORD, 0x0); /* [ Set IQK Matrix = 0 ] equivalent to [ Turn off CCA] */
 
 	/* PHYTXON while loop */
-	odm_set_bb_reg(p_dm, 0x908, MASKDWORD, 0x803);
-	while (odm_get_bb_reg(p_dm, 0xdf4, BIT(6))) {
+	odm_set_bb_reg(p_dm, BBREG_0x908, MASKDWORD, 0x803);
+	while (odm_get_bb_reg(p_dm, BBREG_0xdf4, BIT(6))) {
 		i++;
 		if (i > 1000000) {
 			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Wait in %s() more than %d times!\n", __FUNCTION__, i));
@@ -664,7 +673,7 @@ odm_single_dual_antenna_detection_psd(
 		}
 	}
 
-	odm_set_bb_reg(p_dm, 0xc50, 0x7f, initial_gain);
+	odm_set_bb_reg(p_dm, BBREG_0xc50, 0x7f, initial_gain);
 	odm_set_rf_reg(p_dm, RF_PATH_A, ODM_CHANNEL, 0x7ff, 0x04);     /* Set RF to CH4 & 40M */
 	odm_set_bb_reg(p_dm, REG_FPGA0_ANALOG_PARAMETER4, 0xf00000, 0xf);	/* 3 wire Disable    88c[23:20]=0xf */
 	odm_set_bb_reg(p_dm, REG_FPGA0_PSD_FUNCTION, BIT(14) | BIT15, 0x0);  /* 128 pt	 */ /* Set PSD 128 ptss */
@@ -675,7 +684,7 @@ odm_single_dual_antenna_detection_psd(
 
 	/* Antenna A */
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Switch to Main-ant   (CH4)\n"));
-	odm_set_bb_reg(p_dm, 0x948, 0xfff, 0x200);
+	odm_set_bb_reg(p_dm, BBREG_0x948, 0xfff, 0x200);
 	ODM_delay_us(10);
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("dbg\n"));
 	for (i = 0; i < test_num; i++) {
@@ -687,7 +696,7 @@ odm_single_dual_antenna_detection_psd(
 	}
 	/* Antenna B */
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Switch to Aux-ant   (CH4)\n"));
-	odm_set_bb_reg(p_dm, 0x948, 0xfff, 0x280);
+	odm_set_bb_reg(p_dm, BBREG_0x948, 0xfff, 0x280);
 	ODM_delay_us(10);
 	for (i = 0; i < test_num; i++) {
 		for (tone_idx = 0; tone_idx < tone_lenth_1; tone_idx++) {
@@ -701,7 +710,7 @@ odm_single_dual_antenna_detection_psd(
 	odm_set_bb_reg(p_dm, REG_FPGA0_ANALOG_PARAMETER4, 0xf00000, 0x0);	/* 3 wire enable    88c[23:20]=0x0 */
 	ODM_delay_us(3000);
 
-	odm_set_bb_reg(p_dm, 0xc50, 0x7f, initial_gain);
+	odm_set_bb_reg(p_dm, BBREG_0xc50, 0x7f, initial_gain);
 	odm_set_rf_reg(p_dm, RF_PATH_A, ODM_CHANNEL, 0x7ff, 0x04);     /* Set RF to CH8 & 40M */
 
 	odm_set_bb_reg(p_dm, REG_FPGA0_ANALOG_PARAMETER4, 0xf00000, 0xf);	/* 3 wire Disable    88c[23:20]=0xf */
@@ -709,7 +718,7 @@ odm_single_dual_antenna_detection_psd(
 
 	/* Antenna A */
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Switch to Main-ant   (CH8)\n"));
-	odm_set_bb_reg(p_dm, 0x948, 0xfff, 0x200);
+	odm_set_bb_reg(p_dm, BBREG_0x948, 0xfff, 0x200);
 	ODM_delay_us(10);
 
 	for (i = 0; i < test_num; i++) {
@@ -722,7 +731,7 @@ odm_single_dual_antenna_detection_psd(
 
 	/* Antenna B */
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Switch to Aux-ant   (CH8)\n"));
-	odm_set_bb_reg(p_dm, 0x948, 0xfff, 0x280);
+	odm_set_bb_reg(p_dm, BBREG_0x948, 0xfff, 0x280);
 	ODM_delay_us(10);
 
 	for (i = 0; i < test_num; i++) {
@@ -790,25 +799,22 @@ odm_single_dual_antenna_detection_psd(
 
 	odm_set_rf_reg(p_dm, RF_PATH_A, RF_CHNLBW, RFREGOFFSETMASK, channel_ori);
 	odm_set_bb_reg(p_dm, REG_FPGA0_ANALOG_PARAMETER4, 0xf00000, 0x0);	/* 3 wire enable    88c[23:20]=0x0 */
-	odm_set_bb_reg(p_dm, 0xc50, 0x7f, regc50);
+	odm_set_bb_reg(p_dm, BBREG_0xc50, 0x7f, regc50);
 
 	odm_set_bb_reg(p_dm, REG_S0_S1_PATH_SWITCH, MASKDWORD, reg948);
 	odm_set_bb_reg(p_dm, REG_AGC_TABLE_SELECT, MASKDWORD, regb2c);
 
 	odm_set_bb_reg(p_dm, REG_FPGA0_RFMOD, BIT(24), 1); /* enable whole CCK block */
 	odm_write_1byte(p_dm, REG_TXPAUSE, 0x0); /* Turn on TX	 */ /* Resume TX Queue */
-	odm_set_bb_reg(p_dm, 0xC14, MASKDWORD, regc14); /* [ Set IQK Matrix = 0 ] equivalent to [ Turn on CCA] */
-	odm_set_bb_reg(p_dm, 0x908, MASKDWORD, reg908);
+	odm_set_bb_reg(p_dm, BBREG_0xc14, MASKDWORD, regc14); /* [ Set IQK Matrix = 0 ] equivalent to [ Turn on CCA] */
+	odm_set_bb_reg(p_dm, BBREG_0x908, MASKDWORD, reg908);
 
 	return;
 
 }
 
 #endif
-void
-odm_sw_ant_detect_init(
-	void		*p_dm_void
-)
+void odm_sw_ant_detect_init(void *p_dm_void)
 {
 #if (defined(CONFIG_ANT_DETECTION))
 #if (RTL8723B_SUPPORT == 1)

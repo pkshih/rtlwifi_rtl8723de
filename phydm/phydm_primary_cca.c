@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -28,25 +38,25 @@ phydm_write_dynamic_cca(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct phydm_pricca_struct	*primary_cca = &(p_dm->dm_pri_cca);
+	struct phydm_pricca_struct	*primary_cca = &p_dm->dm_pri_cca;
 
-	if (primary_cca->mf_state != curr_mf_state) {
+	if (primary_cca->mf_state == curr_mf_state)
+		return;
 
-		if (p_dm->support_ic_type & ODM_IC_11N_SERIES) {
-			
-			if (curr_mf_state == MF_USC_LSC) {
-				odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), MF_USC_LSC);
-				odm_set_bb_reg(p_dm, 0xc84, 0xf0000000, primary_cca->cca_th_40m_bkp); /*40M OFDM MF CCA threshold*/
-			} else {
-				odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), curr_mf_state);
-				odm_set_bb_reg(p_dm, 0xc84, 0xf0000000, 0); /*40M OFDM MF CCA threshold*/
-			}
-		}
+	if (p_dm->support_ic_type & ODM_IC_11N_SERIES) {
 		
-		primary_cca->mf_state = curr_mf_state;
-		PHYDM_DBG(p_dm, DBG_PRI_CCA,
-			("Set CCA at ((%s SB)), 0xc6c[8:7]=((%d))\n", ((curr_mf_state == MF_USC_LSC)?"D":((curr_mf_state == MF_LSC)?"L":"U")), curr_mf_state));
+		if (curr_mf_state == MF_USC_LSC) {
+			odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), MF_USC_LSC);
+			odm_set_bb_reg(p_dm, BBREG_0xc84, 0xf0000000, primary_cca->cca_th_40m_bkp); /*40M OFDM MF CCA threshold*/
+		} else {
+			odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), curr_mf_state);
+			odm_set_bb_reg(p_dm, BBREG_0xc84, 0xf0000000, 0); /*40M OFDM MF CCA threshold*/
+		}
 	}
+
+	primary_cca->mf_state = curr_mf_state;
+	PHYDM_DBG(p_dm, DBG_PRI_CCA,
+		("Set CCA at ((%s SB)), BBREG_0xc6c[8:7]=((%d))\n", ((curr_mf_state == MF_USC_LSC)?"D":((curr_mf_state == MF_LSC)?"L":"U")), curr_mf_state));
 }
 
 void
@@ -55,7 +65,7 @@ phydm_primary_cca_reset(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct phydm_pricca_struct	*primary_cca = &(p_dm->dm_pri_cca);
+	struct phydm_pricca_struct	*primary_cca = &p_dm->dm_pri_cca;
 
 	PHYDM_DBG(p_dm, DBG_PRI_CCA, ("[PriCCA] Reset\n"));
 	primary_cca->mf_state = 0xff;
@@ -69,8 +79,8 @@ phydm_primary_cca_11n(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct phydm_pricca_struct	*p_primary_cca = &(p_dm->dm_pri_cca);
-	enum channel_width	curr_bw = (enum channel_width)(*(p_dm->p_band_width));
+	struct phydm_pricca_struct	*p_primary_cca = &p_dm->dm_pri_cca;
+	enum channel_width	curr_bw = (enum channel_width)*p_dm->p_band_width;
 
 	if (!(p_dm->support_ability & ODM_BB_PRIMARY_CCA))
 		return;
@@ -92,13 +102,12 @@ phydm_primary_cca_11n(
 	}
 	
 	if (curr_bw != p_primary_cca->pre_bw) {
-
 		PHYDM_DBG(p_dm, DBG_PRI_CCA, ("[Primary CCA] start ==>\n"));
 		p_primary_cca->pre_bw = curr_bw;
 
 		if (curr_bw == CHANNEL_WIDTH_40) {
 			
-			if ((*(p_dm->p_sec_ch_offset)) == SECOND_CH_AT_LSB) {/* Primary CH @ upper sideband*/
+			if (*p_dm->p_sec_ch_offset == SECOND_CH_AT_LSB) {/* Primary CH @ upper sideband*/
 				
 				PHYDM_DBG(p_dm, DBG_PRI_CCA, ("BW40M, Primary CH at USB\n"));
 				phydm_write_dynamic_cca(p_dm, MF_USC);
@@ -145,7 +154,7 @@ odm_dynamic_primary_cca_8188e(
 		return;
 
 	if (*(p_dm->p_band_width) == CHANNEL_WIDTH_20) {	/*curr bw*/
-		odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), 0);
+		odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), 0);
 		return;
 	}
 
@@ -174,7 +183,6 @@ odm_dynamic_primary_cca_8188e(
 	if (ACTING_AS_AP(p_dm->adapter))   /* primary cca process only do at AP mode */
 #endif
 	{
-
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 		PHYDM_DBG(p_dm, DBG_PRI_CCA, ("ACTING as AP mode=%d\n", ACTING_AS_AP(p_dm->adapter)));
 		/* 3 To get entry's connection and BW infomation status. */
@@ -219,7 +227,7 @@ odm_dynamic_primary_cca_8188e(
 					if (false_alm_cnt->cnt_ofdm_fail > false_alm_cnt->cnt_ofdm_cca >> 1) {
 						primary_cca->intf_type = 1;
 						primary_cca->pri_cca_flag = 1;
-						odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT7, 2); /* USC MF */
+						odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT7, 2); /* USC MF */
 						if (primary_cca->dup_rts_flag == 1)
 							primary_cca->dup_rts_flag = 0;
 					} else {
@@ -238,7 +246,7 @@ odm_dynamic_primary_cca_8188e(
 					if (false_alm_cnt->cnt_ofdm_fail > false_alm_cnt->cnt_ofdm_cca >> 1) {
 						primary_cca->intf_type = 1;
 						primary_cca->pri_cca_flag = 1;
-						odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT7, 1); /* LSC MF */
+						odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT7, 1); /* LSC MF */
 						if (primary_cca->dup_rts_flag == 1)
 							primary_cca->dup_rts_flag = 0;
 					} else {
@@ -267,7 +275,7 @@ odm_dynamic_primary_cca_8188e(
 
 					if (primary_cca->pri_cca_flag == 1) {	/* reset primary cca when STA is disconnected */
 						primary_cca->pri_cca_flag = 0;
-						odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), 0);
+						odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), 0);
 					}
 					if (primary_cca->dup_rts_flag == 1)		/* reset Duplicate RTS when STA is disconnected */
 						primary_cca->dup_rts_flag = 0;
@@ -304,9 +312,9 @@ odm_dynamic_primary_cca_8188e(
 						if (primary_cca->pri_cca_flag == 0) {
 							primary_cca->pri_cca_flag = 1;
 							if (sec_ch_offset == 1)
-								odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), 2);
+								odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), 2);
 							else if (sec_ch_offset == 2)
-								odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), 1);
+								odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), 1);
 						}
 						PHYDM_DBG(p_dm, DBG_PRI_CCA, ("STA Connected 20M!!! primary_cca=%d\n", primary_cca->pri_cca_flag));
 					} else		/* 3 */ { /* client BW = 40MHz */
@@ -315,9 +323,9 @@ odm_dynamic_primary_cca_8188e(
 								if (primary_cca->pri_cca_flag != 1) {
 									primary_cca->pri_cca_flag = 1;
 									if (sec_ch_offset == 1)
-										odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), 2);
+										odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), 2);
 									else if (sec_ch_offset == 2)
-										odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), 1);
+										odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), 1);
 								}
 							} else if (primary_cca->intf_type == 2) {
 								if (primary_cca->dup_rts_flag != 1)
@@ -390,7 +398,7 @@ odm_dynamic_primary_cca_8188e(
 				primary_cca->monitor_flag = 1;     /* monitor flag is triggered!!!!! */
 				if (primary_cca->pri_cca_flag == 1) {
 					primary_cca->pri_cca_flag = 0;
-					odm_set_bb_reg(p_dm, 0xc6c, BIT(8) | BIT(7), 0);
+					odm_set_bb_reg(p_dm, BBREG_0xc6c, BIT(8) | BIT(7), 0);
 				}
 				counter = 0;
 			}
@@ -451,19 +459,16 @@ odm_dynamic_primary_cca_mp_8192e(
 	PHYDM_DBG(p_dm, DBG_PRI_CCA, ("92E: Duplicate RTS Flag=%d\n", primary_cca->dup_rts_flag));
 
 	if (primary_cca->pri_cca_flag == 0) {
-
 		if (sec_ch_offset == SECOND_CH_AT_LSB) {  /* Primary channel is above   NOTE: duplicate CTS can remove this condition */
 
 			if ((OFDM_CCA > OFDMCCA_TH) && (bw_lsc_cnt > (bw_usc_cnt + bw_ind_bias))
 			    && (OFDM_FA > (OFDM_CCA >> 1))) {
-
 				primary_cca->intf_type = 1;
 				primary_cca->intf_flag = 1;
 				phydm_write_dynamic_cca(p_dm, MF_USC);
 				primary_cca->pri_cca_flag = 1;
 			} else if ((OFDM_CCA > OFDMCCA_TH) && (bw_lsc_cnt > (bw_usc_cnt + bw_ind_bias))
 				&& (OFDM_FA < (OFDM_CCA >> 1))) {
-
 				primary_cca->intf_type = 2;
 				primary_cca->intf_flag = 1;
 				phydm_write_dynamic_cca(p_dm, MF_USC);
@@ -471,7 +476,6 @@ odm_dynamic_primary_cca_mp_8192e(
 				primary_cca->dup_rts_flag = 1;
 				p_hal_data->RTSEN = 1;
 			} else {
-
 				primary_cca->intf_type = 0;
 				primary_cca->intf_flag = 0;
 				phydm_write_dynamic_cca(p_dm, MF_USC_LSC);
@@ -480,17 +484,14 @@ odm_dynamic_primary_cca_mp_8192e(
 			}
 
 		} else if (sec_ch_offset == SECOND_CH_AT_USB) {
-
 			if ((OFDM_CCA > OFDMCCA_TH) && (bw_usc_cnt > (bw_lsc_cnt + bw_ind_bias))
 			    && (OFDM_FA > (OFDM_CCA >> 1))) {
-
 				primary_cca->intf_type = 1;
 				primary_cca->intf_flag = 1;
 				phydm_write_dynamic_cca(p_dm, MF_LSC);
 				primary_cca->pri_cca_flag = 1;
 			} else if ((OFDM_CCA > OFDMCCA_TH) && (bw_usc_cnt > (bw_lsc_cnt + bw_ind_bias))
 				&& (OFDM_FA < (OFDM_CCA >> 1))) {
-
 				primary_cca->intf_type = 2;
 				primary_cca->intf_flag = 1;
 				phydm_write_dynamic_cca(p_dm, MF_LSC);
@@ -498,7 +499,6 @@ odm_dynamic_primary_cca_mp_8192e(
 				primary_cca->dup_rts_flag = 1;
 				p_hal_data->RTSEN = 1;
 			} else {
-
 				primary_cca->intf_type = 0;
 				primary_cca->intf_flag = 0;
 				phydm_write_dynamic_cca(p_dm, MF_USC_LSC);
@@ -537,18 +537,16 @@ odm_intf_detection(
 
 	if ((false_alm_cnt->cnt_ofdm_cca > OFDMCCA_TH)
 	    && (false_alm_cnt->cnt_bw_lsc > (false_alm_cnt->cnt_bw_usc + bw_ind_bias))) {
-
 		primary_cca->intf_flag = 1;
-		primary_cca->CH_offset = 1;  /* 1:LSC, 2:USC */
+		primary_cca->ch_offset = 1;  /* 1:LSC, 2:USC */
 		if (false_alm_cnt->cnt_ofdm_fail > (false_alm_cnt->cnt_ofdm_cca >> 1))
 			primary_cca->intf_type = 1;
 		else
 			primary_cca->intf_type = 2;
 	} else if ((false_alm_cnt->cnt_ofdm_cca > OFDMCCA_TH)
 		&& (false_alm_cnt->cnt_bw_usc > (false_alm_cnt->cnt_bw_lsc + bw_ind_bias))) {
-
 		primary_cca->intf_flag = 1;
-		primary_cca->CH_offset = 2;  /* 1:LSC, 2:USC */
+		primary_cca->ch_offset = 2;  /* 1:LSC, 2:USC */
 		if (false_alm_cnt->cnt_ofdm_fail > (false_alm_cnt->cnt_ofdm_cca >> 1))
 			primary_cca->intf_type = 1;
 		else
@@ -556,7 +554,7 @@ odm_intf_detection(
 	} else {
 		primary_cca->intf_flag = 0;
 		primary_cca->intf_type = 0;
-		primary_cca->CH_offset = 0;
+		primary_cca->ch_offset = 0;
 	}
 
 }
@@ -587,7 +585,6 @@ odm_dynamic_primary_cca_ap_8192e(
 	for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
 		p_entry = p_dm->p_phydm_sta_info[i];
 		if (is_sta_active(p_entry)) {
-
 			STA_BW_TMP = p_entry->bw_mode;
 			if (STA_BW_TMP > STA_BW)
 				STA_BW = STA_BW_TMP;
@@ -613,11 +610,11 @@ odm_dynamic_primary_cca_ap_8192e(
 						odm_intf_detection(p_dm);
 					else {	/* intf_flag = 1 */
 						if (primary_cca->intf_type == 1) {
-							if (primary_cca->CH_offset == 1) {
+							if (primary_cca->ch_offset == 1) {
 								cur_mf_state = MF_USC;
 								if (sec_ch_offset == 1)  /* AP,  1: primary is above  2: primary is below */
 									phydm_write_dynamic_cca(p_dm, cur_mf_state);
-							} else if (primary_cca->CH_offset == 2) {
+							} else if (primary_cca->ch_offset == 2) {
 								cur_mf_state = MF_LSC;
 								if (sec_ch_offset == 2)
 									phydm_write_dynamic_cca(p_dm, cur_mf_state);
@@ -668,29 +665,23 @@ odm_dynamic_primary_cca_ap_8192e(
 
 #endif
 
-boolean
-odm_dynamic_primary_cca_dup_rts(
-	void			*p_dm_void
-)
+boolean odm_dynamic_primary_cca_dup_rts(void *p_dm_void)
 {
 #ifdef PHYDM_PRIMARY_CCA
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct phydm_pricca_struct		*primary_cca = &(p_dm->dm_pri_cca);
+	struct phydm_pricca_struct		*primary_cca = &p_dm->dm_pri_cca;
 
 	return	primary_cca->dup_rts_flag;
 #else
-	return	0;	
+	return 0;
 #endif
 }
 
-void
-phydm_primary_cca_init(
-	void			*p_dm_void
-)
+void phydm_primary_cca_init(void *p_dm_void)
 {
 #ifdef PHYDM_PRIMARY_CCA
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct phydm_pricca_struct		*primary_cca = &(p_dm->dm_pri_cca);
+	struct phydm_pricca_struct		*primary_cca = &p_dm->dm_pri_cca;
 
 	if (!(p_dm->support_ability & ODM_BB_PRIMARY_CCA))
 		return;
@@ -708,14 +699,11 @@ phydm_primary_cca_init(
 	primary_cca->pre_bw = (enum channel_width)0xff;
 	
 	if (p_dm->support_ic_type & ODM_IC_11N_SERIES)
-		primary_cca->cca_th_40m_bkp = (u8)odm_get_bb_reg(p_dm, 0xc84, 0xf0000000);
+		primary_cca->cca_th_40m_bkp = (u8)odm_get_bb_reg(p_dm, BBREG_0xc84, 0xf0000000);
 #endif
 }
 
-void
-phydm_primary_cca(
-	void			*p_dm_void
-)
+void phydm_primary_cca(void *p_dm_void)
 {
 #ifdef PHYDM_PRIMARY_CCA
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
@@ -730,5 +718,4 @@ phydm_primary_cca(
 
 #endif
 }
-
 

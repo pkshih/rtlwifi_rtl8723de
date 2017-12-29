@@ -44,7 +44,6 @@ phydm_mod-objs := \
 		phydm_adaptivity.o\
 		phydm_cfotracking.o\
 		phydm_noisemonitor.o\
-		phydm_acs.o\
 		phydm_dfs.o \
 		phydm_adc_sampling.o\
 		phydm_ccx.o\

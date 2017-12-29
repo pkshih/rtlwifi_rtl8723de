@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,8 +8,18 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
@@ -23,7 +33,6 @@
 #define READ_AND_CONFIG_MP(ic, txt) (odm_read_and_config_mp_##ic##txt(p_dm))
 #define READ_AND_CONFIG_TC(ic, txt) (odm_read_and_config_tc_##ic##txt(p_dm))
 
-
 #if (PHYDM_TESTCHIP_SUPPORT == 1)
 #define READ_AND_CONFIG(ic, txt) do {\
 		if (p_dm->is_mp_chip)\
@@ -32,38 +41,39 @@
 			READ_AND_CONFIG_TC(ic, txt);\
 	} while (0)
 #else
-#define READ_AND_CONFIG     READ_AND_CONFIG_MP
+#define READ_AND_CONFIG READ_AND_CONFIG_MP
 #endif
 
-#define GET_VERSION_MP(ic, txt)		(odm_get_version_mp_##ic##txt())
-#define GET_VERSION_TC(ic, txt)		(odm_get_version_tc_##ic##txt())
+#define GET_VERSION_MP(ic, txt) (odm_get_version_mp_##ic##txt())
+#define GET_VERSION_TC(ic, txt) (odm_get_version_tc_##ic##txt())
 
 #if (PHYDM_TESTCHIP_SUPPORT == 1)
 	#define GET_VERSION(ic, txt) (p_dm->is_mp_chip ? GET_VERSION_MP(ic, txt) : GET_VERSION_TC(ic, txt))
 #else
-	#define GET_VERSION(ic, txt) GET_VERSION_MP(ic, txt)
+#define GET_VERSION(ic, txt) GET_VERSION_MP(ic, txt)
 #endif
 
 enum hal_status
-odm_config_rf_with_header_file(
-	struct PHY_DM_STRUCT		*p_dm,
-	enum odm_rf_config_type		config_type,
-	u8			e_rf_path
-)
+odm_config_rf_with_header_file(struct PHY_DM_STRUCT *p_dm,
+			       enum odm_rf_config_type config_type,
+			       u8 e_rf_path)
 {
 #if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	struct _ADAPTER		*adapter = p_dm->adapter;
-	PMGNT_INFO		p_mgnt_info = &(adapter->MgntInfo);
+	PMGNT_INFO		p_mgnt_info = &adapter->MgntInfo;
 #endif
-	enum hal_status	result = HAL_STATUS_SUCCESS;
+	enum hal_status result = HAL_STATUS_SUCCESS;
 
 	PHYDM_DBG(p_dm, ODM_COMP_INIT,
-		("===>odm_config_rf_with_header_file (%s)\n", (p_dm->is_mp_chip) ? "MPChip" : "TestChip"));
-	PHYDM_DBG(p_dm, ODM_COMP_INIT,
+		  ("===>odm_config_rf_with_header_file (%s)\n",
+		   (p_dm->is_mp_chip) ? "MPChip" : "TestChip"));
+	PHYDM_DBG(
+		p_dm, ODM_COMP_INIT,
 		("support_platform: 0x%X, support_interface: 0x%X, board_type: 0x%X\n",
-		p_dm->support_platform, p_dm->support_interface, p_dm->board_type));
+		 p_dm->support_platform, p_dm->support_interface,
+		 p_dm->board_type));
 
-	/* 1 AP doesn't use PHYDM power tracking table in these ICs */
+/* 1 AP doesn't use PHYDM power tracking table in these ICs */
 #if (DM_ODM_SUPPORT_TYPE != ODM_AP)
 #if (RTL8812A_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8812) {
@@ -151,7 +161,7 @@ odm_config_rf_with_header_file(
 
 #endif/* (DM_ODM_SUPPORT_TYPE !=  ODM_AP) */
 
-	/* 1 All platforms support */
+/* 1 All platforms support */
 #if (RTL8188E_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8188E) {
 		if (config_type == CONFIG_RF_RADIO) {
@@ -268,16 +278,11 @@ odm_config_rf_with_header_file(
 
 	if (config_type == CONFIG_RF_RADIO) {
 		if (p_dm->fw_offload_ability & PHYDM_PHY_PARAM_OFFLOAD) {
-
-			result = phydm_set_reg_by_fw(p_dm,
-							PHYDM_HALMAC_CMD_END,
-							0,
-							0,
-							0,
-							(enum rf_path)0,
-							0);
+			result = phydm_set_reg_by_fw(p_dm, PHYDM_HALMAC_CMD_END,
+						     0, 0, 0, (enum rf_path)0,
+						     0);
 			PHYDM_DBG(p_dm, ODM_COMP_INIT,
-				("rf param offload end!result = %d", result));
+				  ("rf param offload end!result = %d", result));
 		}
 	}
 
@@ -285,18 +290,18 @@ odm_config_rf_with_header_file(
 }
 
 enum hal_status
-odm_config_rf_with_tx_pwr_track_header_file(
-	struct PHY_DM_STRUCT		*p_dm
-)
+odm_config_rf_with_tx_pwr_track_header_file(struct PHY_DM_STRUCT *p_dm)
 {
 	PHYDM_DBG(p_dm, ODM_COMP_INIT,
-		("===>odm_config_rf_with_tx_pwr_track_header_file (%s)\n", (p_dm->is_mp_chip) ? "MPChip" : "TestChip"));
-	PHYDM_DBG(p_dm, ODM_COMP_INIT,
+		  ("===>odm_config_rf_with_tx_pwr_track_header_file (%s)\n",
+		   (p_dm->is_mp_chip) ? "MPChip" : "TestChip"));
+	PHYDM_DBG(
+		p_dm, ODM_COMP_INIT,
 		("support_platform: 0x%X, support_interface: 0x%X, board_type: 0x%X\n",
-		p_dm->support_platform, p_dm->support_interface, p_dm->board_type));
+		 p_dm->support_platform, p_dm->support_interface,
+		 p_dm->board_type));
 
-
-	/* 1 AP doesn't use PHYDM power tracking table in these ICs */
+/* 1 AP doesn't use PHYDM power tracking table in these ICs */
 #if (DM_ODM_SUPPORT_TYPE != ODM_AP)
 #if RTL8821A_SUPPORT
 	if (p_dm->support_ic_type == ODM_RTL8821) {
@@ -359,7 +364,7 @@ odm_config_rf_with_tx_pwr_track_header_file(
 
 #if RTL8188E_SUPPORT
 	if (p_dm->support_ic_type == ODM_RTL8188E) {
-		if (odm_get_mac_reg(p_dm, 0xF0, 0xF000) >= 8) {		/*if 0xF0[15:12] >= 8, SMIC*/
+		if (odm_get_mac_reg(p_dm, 0xF0, MACREG_0xF000) >= 8) {		/*if 0xF0[15:12] >= 8, SMIC*/
 			if (p_dm->support_interface == ODM_ITRF_PCIE)
 				READ_AND_CONFIG_MP(8188e, _txpowertrack_pcie_icut);
 			else if (p_dm->support_interface == ODM_ITRF_USB)
@@ -379,7 +384,7 @@ odm_config_rf_with_tx_pwr_track_header_file(
 #endif
 #endif/* (DM_ODM_SUPPORT_TYPE !=  ODM_AP) */
 
-	/* 1 All platforms support */
+/* 1 All platforms support */
 #if RTL8723B_SUPPORT
 	if (p_dm->support_ic_type == ODM_RTL8723B) {
 		if (p_dm->support_interface == ODM_ITRF_PCIE)
@@ -493,18 +498,16 @@ odm_config_rf_with_tx_pwr_track_header_file(
 }
 
 enum hal_status
-odm_config_bb_with_header_file(
-	struct PHY_DM_STRUCT		*p_dm,
-	enum odm_bb_config_type		config_type
-)
+odm_config_bb_with_header_file(struct PHY_DM_STRUCT *p_dm,
+			       enum odm_bb_config_type config_type)
 {
 #if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	struct _ADAPTER		*adapter = p_dm->adapter;
-	PMGNT_INFO		p_mgnt_info = &(adapter->MgntInfo);
+	PMGNT_INFO		p_mgnt_info = &adapter->MgntInfo;
 #endif
-	enum hal_status	result = HAL_STATUS_SUCCESS;
+	enum hal_status result = HAL_STATUS_SUCCESS;
 
-	/* 1 AP doesn't use PHYDM initialization in these ICs */
+/* 1 AP doesn't use PHYDM initialization in these ICs */
 #if (DM_ODM_SUPPORT_TYPE != ODM_AP)
 #if (RTL8812A_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8812) {
@@ -607,8 +610,7 @@ odm_config_bb_with_header_file(
 
 #endif/* (DM_ODM_SUPPORT_TYPE !=  ODM_AP) */
 
-
-	/* 1 All platforms support */
+/* 1 All platforms support */
 #if (RTL8188E_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8188E) {
 		if (config_type == CONFIG_BB_PHY_REG)
@@ -701,7 +703,6 @@ odm_config_bb_with_header_file(
 			else
 				READ_AND_CONFIG_MP(8822b, _phy_reg_pg);
 		}
-
 	}
 #endif
 
@@ -753,36 +754,33 @@ odm_config_bb_with_header_file(
 	}
 #endif
 
-	if (config_type == CONFIG_BB_PHY_REG || config_type == CONFIG_BB_AGC_TAB)
+	if (config_type == CONFIG_BB_PHY_REG ||
+	    config_type == CONFIG_BB_AGC_TAB)
 		if (p_dm->fw_offload_ability & PHYDM_PHY_PARAM_OFFLOAD) {
-
-			result = phydm_set_reg_by_fw(p_dm,
-								PHYDM_HALMAC_CMD_END,
-								0,
-								0,
-								0,
-								(enum rf_path)0,
-								0);
-			PHYDM_DBG(p_dm, ODM_COMP_INIT,
+			result = phydm_set_reg_by_fw(p_dm, PHYDM_HALMAC_CMD_END,
+						     0, 0, 0, (enum rf_path)0,
+						     0);
+			PHYDM_DBG(
+				p_dm, ODM_COMP_INIT,
 				("phy param offload end!result = %d", result));
 		}
 
 	return result;
 }
 
-enum hal_status
-odm_config_mac_with_header_file(
-	struct PHY_DM_STRUCT	*p_dm
-)
+enum hal_status odm_config_mac_with_header_file(struct PHY_DM_STRUCT *p_dm)
 {
-	enum hal_status	result = HAL_STATUS_SUCCESS;
+	enum hal_status result = HAL_STATUS_SUCCESS;
 	PHYDM_DBG(p_dm, ODM_COMP_INIT,
-		("===>odm_config_mac_with_header_file (%s)\n", (p_dm->is_mp_chip) ? "MPChip" : "TestChip"));
-	PHYDM_DBG(p_dm, ODM_COMP_INIT,
+		  ("===>odm_config_mac_with_header_file (%s)\n",
+		   (p_dm->is_mp_chip) ? "MPChip" : "TestChip"));
+	PHYDM_DBG(
+		p_dm, ODM_COMP_INIT,
 		("support_platform: 0x%X, support_interface: 0x%X, board_type: 0x%X\n",
-		p_dm->support_platform, p_dm->support_interface, p_dm->board_type));
+		 p_dm->support_platform, p_dm->support_interface,
+		 p_dm->board_type));
 
-	/* 1 AP doesn't use PHYDM initialization in these ICs */
+/* 1 AP doesn't use PHYDM initialization in these ICs */
 #if (DM_ODM_SUPPORT_TYPE != ODM_AP)
 #if (RTL8812A_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8812)
@@ -808,7 +806,7 @@ odm_config_mac_with_header_file(
 
 #endif/* (DM_ODM_SUPPORT_TYPE !=  ODM_AP) */
 
-	/* 1 All platforms support */
+/* 1 All platforms support */
 #if (RTL8188E_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8188E)
 		READ_AND_CONFIG_MP(8188e, _mac_reg);
@@ -850,29 +848,20 @@ odm_config_mac_with_header_file(
 #endif
 
 	if (p_dm->fw_offload_ability & PHYDM_PHY_PARAM_OFFLOAD) {
-
-		result = phydm_set_reg_by_fw(p_dm,
-							PHYDM_HALMAC_CMD_END,
-							0,
-							0,
-							0,
-							(enum rf_path)0,
-							0);
+		result = phydm_set_reg_by_fw(p_dm, PHYDM_HALMAC_CMD_END, 0, 0,
+					     0, (enum rf_path)0, 0);
 		PHYDM_DBG(p_dm, ODM_COMP_INIT,
-			("mac param offload end!result = %d", result));
+			  ("mac param offload end!result = %d", result));
 	}
 
 	return result;
 }
 
-u32
-odm_get_hw_img_version(
-	struct PHY_DM_STRUCT	*p_dm
-)
+u32 odm_get_hw_img_version(struct PHY_DM_STRUCT *p_dm)
 {
-	u32  version = 0;
+	u32 version = 0;
 
-	/* 1 AP doesn't use PHYDM initialization in these ICs */
+/* 1 AP doesn't use PHYDM initialization in these ICs */
 #if (DM_ODM_SUPPORT_TYPE != ODM_AP)
 #if (RTL8821A_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8821)
@@ -898,7 +887,7 @@ odm_get_hw_img_version(
 
 #endif /* (DM_ODM_SUPPORT_TYPE != ODM_AP) */
 
-	/*1 All platforms support*/
+/*1 All platforms support*/
 #if (RTL8188E_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8188E)
 		version = GET_VERSION_MP(8188e, _mac_reg);
@@ -937,11 +926,7 @@ odm_get_hw_img_version(
 	return version;
 }
 
-
-u32
-query_phydm_trx_capability(
-	struct PHY_DM_STRUCT					*p_dm
-)
+u32 query_phydm_trx_capability(struct PHY_DM_STRUCT *p_dm)
 {
 	u32 value32 = 0xFFFFFFFF;
 
@@ -953,10 +938,7 @@ query_phydm_trx_capability(
 	return value32;
 }
 
-u32
-query_phydm_stbc_capability(
-	struct PHY_DM_STRUCT					*p_dm
-)
+u32 query_phydm_stbc_capability(struct PHY_DM_STRUCT *p_dm)
 {
 	u32 value32 = 0xFFFFFFFF;
 
@@ -968,10 +950,7 @@ query_phydm_stbc_capability(
 	return value32;
 }
 
-u32
-query_phydm_ldpc_capability(
-	struct PHY_DM_STRUCT					*p_dm
-)
+u32 query_phydm_ldpc_capability(struct PHY_DM_STRUCT *p_dm)
 {
 	u32 value32 = 0xFFFFFFFF;
 
@@ -983,10 +962,7 @@ query_phydm_ldpc_capability(
 	return value32;
 }
 
-u32
-query_phydm_txbf_parameters(
-	struct PHY_DM_STRUCT					*p_dm
-)
+u32 query_phydm_txbf_parameters(struct PHY_DM_STRUCT *p_dm)
 {
 	u32 value32 = 0xFFFFFFFF;
 
@@ -998,10 +974,7 @@ query_phydm_txbf_parameters(
 	return value32;
 }
 
-u32
-query_phydm_txbf_capability(
-	struct PHY_DM_STRUCT					*p_dm
-)
+u32 query_phydm_txbf_capability(struct PHY_DM_STRUCT *p_dm)
 {
 	u32 value32 = 0xFFFFFFFF;
 

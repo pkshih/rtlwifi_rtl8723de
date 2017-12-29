@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017  Realtek Corporation.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -8,24 +8,32 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
+ *
+ * The full GNU General Public License is included in this distribution in the
+ * file called LICENSE.
+ *
+ * Contact Information:
+ * wlanfae <wlanfae@realtek.com>
+ * Realtek Corporation, No. 2, Innovation Road II, Hsinchu Science Park,
+ * Hsinchu 300, Taiwan.
+ *
+ * Larry Finger <Larry.Finger@lwfinger.net>
  *
  *****************************************************************************/
 
+#ifndef __PHYDM_AUTO_DBG_H__
+#define __PHYDM_AUTO_DBG_H__
 
-#ifndef	__PHYDM_AUTO_DBG_H__
-#define    __PHYDM_AUTO_DBG_H__
-
-#define AUTO_DBG_VERSION	"1.0"		/* 2017.05.015  Dino, Add phydm_auto_dbg.h*/
-
+#define AUTO_DBG_VERSION "1.0" /* 2017.05.015  Dino, Add phydm_auto_dbg.h*/
 
 /* 1 ============================================================
  * 1  Definition
  * 1 ============================================================ */
 
-#define	AUTO_CHK_HANG_STEP_MAX	3
-#define	DBGPORT_CHK_NUM			6
+#define AUTO_CHK_HANG_STEP_MAX 3
+#define DBGPORT_CHK_NUM 6
 
 #ifdef PHYDM_AUTO_DEGBUG
 
@@ -72,7 +80,6 @@ struct n_dbgport_803 {
 };
 
 struct phydm_auto_dbg_struc {
-
 	enum	auto_dbg_type_e	auto_dbg_type;
 	u8		dbg_step;
 	u16		dbg_port_table[DBGPORT_CHK_NUM];
@@ -103,13 +110,7 @@ phydm_auto_dbg_console(
 );
 #endif
 
-void
-phydm_auto_dbg_engine(
-	void			*p_dm_void
-);
+void phydm_auto_dbg_engine(void *p_dm_void);
 
-void
-phydm_auto_dbg_engine_init(
-	void		*p_dm_void
-);
+void phydm_auto_dbg_engine_init(void *p_dm_void);
 #endif
