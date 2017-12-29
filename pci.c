@@ -1615,6 +1615,7 @@ static int rtl_pci_tx(struct ieee80211_hw *hw,
 		      struct rtl_tcb_desc *ptcb_desc)
 {
 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+	struct rtl_sta_info *sta_entry = NULL;
 	struct ieee80211_tx_info *info = IEEE80211_SKB_CB(skb);
 	struct rtl8192_tx_ring *ring;
 	struct rtl_tx_desc *pdesc;
@@ -1646,6 +1647,11 @@ static int rtl_pci_tx(struct ieee80211_hw *hw,
 		rtlpriv->stats.txbytesbroadcast += skb->len;
 	else
 		rtlpriv->stats.txbytesunicast += skb->len;
+
+	if (sta) {
+		sta_entry = (struct rtl_sta_info *)sta->drv_priv;
+		sta_entry->txbytes += skb->len;
+	}
 
 	spin_lock_irqsave(&rtlpriv->locks.irq_th_lock, flags);
 	ring = &rtlpci->tx_ring[hw_queue];

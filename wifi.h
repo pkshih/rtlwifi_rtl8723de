@@ -1328,6 +1328,7 @@ struct rtl_tid_data {
 
 struct rtl_sta_info {
 	struct list_head list;
+	struct rtl_priv *rtlpriv;
 	struct rtl_tid_data tids[MAX_TID_COUNT];
 	/* just used for ap adhoc or mesh*/
 	struct rssi_sta rssi_stat;
@@ -1337,6 +1338,9 @@ struct rtl_sta_info {
 	u8 ratr_index;
 	u8 mimo_ps;
 	u8 mac_addr[ETH_ALEN];
+	u64 txbytes;	/* total tx bytes */
+	u64 last_txbytes;
+	u64 txbytes_inperiod;
 } __packed;
 
 struct rtl_priv;
@@ -2889,6 +2893,9 @@ struct rtl_priv {
 #ifdef CONFIG_PM
 	struct wiphy_wowlan_support wowlan;
 #endif
+
+	struct rtl_sta_info *sta;
+
 	/*This must be the last item so
 	   that it points to the data allocated
 	   beyond  this structure like:

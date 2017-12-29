@@ -918,6 +918,8 @@ static int rtl_op_sta_add(struct ieee80211_hw *hw,
 		spin_lock_bh(&rtlpriv->locks.entry_list_lock);
 		list_add_tail(&sta_entry->list, &rtlpriv->entry_list);
 		spin_unlock_bh(&rtlpriv->locks.entry_list_lock);
+		sta_entry->rtlpriv = rtlpriv;
+
 		if (rtlhal->current_bandtype == BAND_ON_2_4G) {
 			sta_entry->wireless_mode = WIRELESS_MODE_G;
 			if (sta->supp_rates[0] <= 0xf)
@@ -951,6 +953,8 @@ static int rtl_op_sta_add(struct ieee80211_hw *hw,
 
 		if (rtlpriv->phydm.ops)
 			rtlpriv->phydm.ops->phydm_add_sta(rtlpriv, sta);
+
+		rtlpriv->sta = sta_entry;
 	}
 
 	return 0;
@@ -966,12 +970,15 @@ static int rtl_op_sta_remove(struct ieee80211_hw *hw,
 		RT_TRACE(rtlpriv, COMP_MAC80211, DBG_DMESG,
 			 "Remove sta addr is %pM\n", sta->addr);
 
+		rtlpriv->sta = NULL;
+
 		if (rtlpriv->phydm.ops)
 			rtlpriv->phydm.ops->phydm_del_sta(rtlpriv, sta);
 
 		sta_entry = (struct rtl_sta_info *)sta->drv_priv;
 		sta_entry->wireless_mode = 0;
 		sta_entry->ratr_index = 0;
+		sta_entry->rtlpriv = NULL;
 		spin_lock_bh(&rtlpriv->locks.entry_list_lock);
 		list_del(&sta_entry->list);
 		spin_unlock_bh(&rtlpriv->locks.entry_list_lock);
