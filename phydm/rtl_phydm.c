@@ -288,8 +288,15 @@ static int _rtl_phydm_init_com_info(struct rtl_priv *rtlpriv,
 
 	odm_cmn_info_hook(dm, ODM_CMNINFO_SEC_CHNL_OFFSET,
 			  &mac->cur_40_prime_sc);
+#if 0
+	odm_cmn_info_hook(dm, ODM_CMNINFO_SEC_MODE,
+			  &adapter->securitypriv.dot11PrivacyAlgrthm);
+#endif
 	odm_cmn_info_hook(dm, ODM_CMNINFO_BW, &rtlphy->current_chan_bw);
 	odm_cmn_info_hook(dm, ODM_CMNINFO_CHNL, &rtlphy->current_channel);
+#if 0
+	odm_cmn_info_hook(dm, ODM_CMNINFO_NET_CLOSED, &adapter->net_closed);
+#endif
 
 	odm_cmn_info_hook(dm, ODM_CMNINFO_SCAN, &mac->act_scanning);
 	odm_cmn_info_hook(dm, ODM_CMNINFO_POWER_SAVING,
