@@ -909,6 +909,7 @@ static int rtl_op_sta_add(struct ieee80211_hw *hw,
 			 struct ieee80211_sta *sta)
 {
 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+	struct rtl_phy *rtlphy = &(rtlpriv->phy);
 	struct rtl_hal *rtlhal = rtl_hal(rtl_priv(hw));
 	struct rtl_mac *mac = rtl_mac(rtl_priv(hw));
 	struct rtl_sta_info *sta_entry;
@@ -1109,6 +1110,7 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 				    u32 changed)
 {
 	struct rtl_priv *rtlpriv = rtl_priv(hw);
+	struct rtl_phy *rtlphy = &(rtlpriv->phy);
 	struct rtl_hal *rtlhal = rtl_hal(rtlpriv);
 	struct rtl_mac *mac = rtl_mac(rtl_priv(hw));
 	struct rtl_ps_ctl *ppsc = rtl_psc(rtl_priv(hw));
@@ -1350,6 +1352,16 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 			    mac->current_ampdu_factor)
 				mac->current_ampdu_factor =
 				    sta->ht_cap.ampdu_factor;
+
+			if (sta->ht_cap.ht_supported) {
+				if (sta->ht_cap.cap &
+				    IEEE80211_HT_CAP_SUP_WIDTH_20_40)
+					rtlphy->max_ht_chan_bw =
+							HT_CHANNEL_WIDTH_20_40;
+				else
+					rtlphy->max_ht_chan_bw =
+							HT_CHANNEL_WIDTH_20;
+			}
 		}
 		rcu_read_unlock();
 
@@ -1473,6 +1485,8 @@ static void rtl_op_bss_info_changed(struct ieee80211_hw *hw,
 						HT_CHANNEL_WIDTH_20;
 			}
 
+			if (sta->vht_cap.vht_supported)
+				rtlphy->max_vht_chan_bw = HT_CHANNEL_WIDTH_80;
 		} else {
 			RT_TRACE(rtlpriv, COMP_MAC80211, DBG_WARNING,
 				 "Warnning!!sta is NULL ( line%d)\n", __LINE__);
