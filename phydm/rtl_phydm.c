@@ -1060,6 +1060,7 @@ static struct rtl_phydm_ops rtl_phydm_operation = {
 
 	/* debug */
 	.phydm_debug_cmd = rtl_phydm_debug_cmd,
+	.phydm_dump_sta_info = rtl_phydm_dump_sta_info,
 };
 
 struct rtl_phydm_ops *rtl_phydm_get_ops_pointer(void)

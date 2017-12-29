@@ -303,6 +303,22 @@ static struct rtl_debugfs_priv rtl_debug_priv_btcoex = {
 	.cb_data = 0,
 };
 
+static int rtl_dump_sta_info(struct seq_file *m, void *v)
+{
+	struct rtl_debugfs_priv *debugfs_priv = m->private;
+	struct rtl_priv *rtlpriv = debugfs_priv->rtlpriv;
+	struct rtl_sta_info *sta = rtlpriv->sta;
+
+	rtlpriv->phydm.ops->phydm_dump_sta_info(rtlpriv, m, sta);
+
+	return 0;
+}
+
+static struct rtl_debugfs_priv rtl_debug_priv_dump_sta_info = {
+	.cb_read = rtl_dump_sta_info,
+	.cb_data = 0,
+};
+
 static ssize_t rtl_debugfs_set_write_reg(struct file *filp,
 					 const char __user *buffer,
 					 size_t count, loff_t *loff)
@@ -534,6 +550,7 @@ void rtl_debug_add_one(struct ieee80211_hw *hw)
 	RTL_DEBUGFS_ADD(cam_3);
 
 	RTL_DEBUGFS_ADD(btcoex);
+	RTL_DEBUGFS_ADD(dump_sta_info);
 
 	RTL_DEBUGFS_ADD_W(write_reg);
 	RTL_DEBUGFS_ADD_W(write_h2c);

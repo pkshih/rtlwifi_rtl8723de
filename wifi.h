@@ -2764,6 +2764,8 @@ struct rtl_phydm_ops {
 	/* debug */
 	bool (*phydm_debug_cmd)(struct rtl_priv *rtlpriv, char *in, u32 in_len,
 				char *out, u32 out_len);
+	void (*phydm_dump_sta_info)(struct rtl_priv *rtlpriv, void *sel,
+				    struct rtl_sta_info *sta_entry);
 
 };
 
